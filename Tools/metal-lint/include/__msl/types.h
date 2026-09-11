@@ -344,14 +344,14 @@ __MSL_ELEM(bool3, bool)
 __MSL_ELEM(bool4, bool)
 }
 #define __MSL_BOOLVEC_OPS(BV)                                             \
-    constexpr BV operator!(const BV& a);                                  \
-    constexpr BV operator&&(const BV& a, const BV& b);                    \
-    constexpr BV operator||(const BV& a, const BV& b);                    \
-    constexpr BV operator&(const BV& a, const BV& b);                     \
-    constexpr BV operator|(const BV& a, const BV& b);                     \
-    constexpr BV operator^(const BV& a, const BV& b);                     \
-    constexpr BV operator==(const BV& a, const BV& b);                    \
-    constexpr BV operator!=(const BV& a, const BV& b);
+    BV operator!(const BV& a);                                  \
+    BV operator&&(const BV& a, const BV& b);                    \
+    BV operator||(const BV& a, const BV& b);                    \
+    BV operator&(const BV& a, const BV& b);                     \
+    BV operator|(const BV& a, const BV& b);                     \
+    BV operator^(const BV& a, const BV& b);                     \
+    BV operator==(const BV& a, const BV& b);                    \
+    BV operator!=(const BV& a, const BV& b);
 __MSL_BOOLVEC_OPS(bool2)
 __MSL_BOOLVEC_OPS(bool3)
 __MSL_BOOLVEC_OPS(bool4)

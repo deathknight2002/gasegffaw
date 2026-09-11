@@ -101,7 +101,7 @@ half2 unpack_snorm2x16_to_half(uint);
 
 // ---- numeric_limits -------------------------------------------------------
 template <class T> struct numeric_limits;
-#define __MSL_LIMITS(T, MINV, MAXV, LOWV, EPSV, INFV, DIGITS)                   \
+#define __MSL_LIMITS(T, MINV, MAXV, LOWV, EPSV, INFV, NANV, DIGITS)             \
     template <> struct numeric_limits<T> {                                      \
         static constexpr bool is_specialized = true;                            \
         static constexpr int digits = DIGITS;                                   \
@@ -110,20 +110,20 @@ template <class T> struct numeric_limits;
         static constexpr T lowest() { return LOWV; }                            \
         static constexpr T epsilon() { return EPSV; }                           \
         static constexpr T infinity() { return INFV; }                          \
-        static constexpr T quiet_NaN() { return (T)__builtin_nanf(""); }        \
+        static constexpr T quiet_NaN() { return NANV; }                          \
         static constexpr T denorm_min() { return MINV; }                        \
     };
-__MSL_LIMITS(float, FLT_MIN, FLT_MAX, -FLT_MAX, FLT_EPSILON, __builtin_inff(), 24)
-__MSL_LIMITS(half, HALF_MIN, HALF_MAX, -HALF_MAX, HALF_EPSILON, HUGE_VALH, 11)
-__MSL_LIMITS(bool, false, true, false, false, false, 1)
-__MSL_LIMITS(char, SCHAR_MIN, SCHAR_MAX, SCHAR_MIN, 0, 0, 7)
-__MSL_LIMITS(uchar, 0, UCHAR_MAX, 0, 0, 0, 8)
-__MSL_LIMITS(short, SHRT_MIN, SHRT_MAX, SHRT_MIN, 0, 0, 15)
-__MSL_LIMITS(ushort, 0, USHRT_MAX, 0, 0, 0, 16)
-__MSL_LIMITS(int, INT_MIN, INT_MAX, INT_MIN, 0, 0, 31)
-__MSL_LIMITS(uint, 0u, UINT_MAX, 0u, 0u, 0u, 32)
-__MSL_LIMITS(long, LONG_MIN, LONG_MAX, LONG_MIN, 0, 0, 63)
-__MSL_LIMITS(ulong, 0ul, ULONG_MAX, 0ul, 0ul, 0ul, 64)
+__MSL_LIMITS(float, FLT_MIN, FLT_MAX, -FLT_MAX, FLT_EPSILON, __builtin_inff(), __builtin_nanf(""), 24)
+__MSL_LIMITS(half, HALF_MIN, HALF_MAX, -HALF_MAX, HALF_EPSILON, HUGE_VALH, (half)__builtin_nanf(""), 11)
+__MSL_LIMITS(bool, false, true, false, false, false, false, 1)
+__MSL_LIMITS(char, SCHAR_MIN, SCHAR_MAX, SCHAR_MIN, 0, 0, 0, 7)
+__MSL_LIMITS(uchar, 0, UCHAR_MAX, 0, 0, 0, 0, 8)
+__MSL_LIMITS(short, SHRT_MIN, SHRT_MAX, SHRT_MIN, 0, 0, 0, 15)
+__MSL_LIMITS(ushort, 0, USHRT_MAX, 0, 0, 0, 0, 16)
+__MSL_LIMITS(int, INT_MIN, INT_MAX, INT_MIN, 0, 0, 0, 31)
+__MSL_LIMITS(uint, 0u, UINT_MAX, 0u, 0u, 0u, 0u, 32)
+__MSL_LIMITS(long, LONG_MIN, LONG_MAX, LONG_MIN, 0, 0, 0, 63)
+__MSL_LIMITS(ulong, 0ul, ULONG_MAX, 0ul, 0ul, 0ul, 0ul, 64)
 #undef __MSL_LIMITS
 
 // ---- fragment-only helpers ------------------------------------------------

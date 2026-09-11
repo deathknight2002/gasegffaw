@@ -1,0 +1,459 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 60;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0281225B85C9465EA76EBA2FB32C3F34 /* CoreHaptics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F5C20BE65803C4B96DA7CC9465F9CDE9 /* CoreHaptics.framework */; };
+		1FC5EF9649C9010B869F4F56725D8BDC /* RitualCore in Frameworks */ = {isa = PBXBuildFile; productRef = 77F6E3FC7D51B845F209AD09F6E5EE12 /* RitualCore */; };
+		821F7EE9E2C264BE974354F3D10ED455 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FE0E38905D3369FDB40B4DFECA027013 /* Metal.framework */; };
+		8DCDC3BD74282C6C92C1FB47B1159081 /* RitualText.json in Resources */ = {isa = PBXBuildFile; fileRef = 8D0DD46CE76578B10C5307655BAD8DFE /* RitualText.json */; };
+		BB6AF6465E51D417BC3A1E8D4819BA4C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8A16ECD0B2DE16E8C67668FE6B5F4D7B /* Assets.xcassets */; };
+		D6672B16BEDCA07199C6FC656FC4082D /* MetalFX.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB604F68489C09286FD316F915DAED09 /* MetalFX.framework */; };
+		EDAA7B1644586D9700505C139B816A92 /* MetalKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBC63B7419993462192466ACABCB8DB4 /* MetalKit.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		12702A86AC8BB4992C8B39B307A29904 /* BornlessRitual.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BornlessRitual.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1BBAA8C0F020C61C3091471DE08DD6CA /* RitualCore */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = RitualCore; sourceTree = "<group>"; };
+		52466D879842561D4F9EAF0024D4F510 /* ShaderTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ShaderTypes.h; sourceTree = "<group>"; };
+		82A4C5BBEC818FF39529F002EC78032E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		8A16ECD0B2DE16E8C67668FE6B5F4D7B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		8D0DD46CE76578B10C5307655BAD8DFE /* RitualText.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = RitualText.json; sourceTree = "<group>"; };
+		A3BB1B2725AA73F0B575045B6E56CB6D /* BornlessRitual-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "BornlessRitual-Bridging-Header.h"; sourceTree = "<group>"; };
+		BB604F68489C09286FD316F915DAED09 /* MetalFX.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalFX.framework; path = System/Library/Frameworks/MetalFX.framework; sourceTree = SDKROOT; };
+		DBC63B7419993462192466ACABCB8DB4 /* MetalKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalKit.framework; path = System/Library/Frameworks/MetalKit.framework; sourceTree = SDKROOT; };
+		F5C20BE65803C4B96DA7CC9465F9CDE9 /* CoreHaptics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreHaptics.framework; path = System/Library/Frameworks/CoreHaptics.framework; sourceTree = SDKROOT; };
+		FE0E38905D3369FDB40B4DFECA027013 /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		350396C1D35F626E45AB8E128EF30AB1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1FC5EF9649C9010B869F4F56725D8BDC /* RitualCore in Frameworks */,
+				0281225B85C9465EA76EBA2FB32C3F34 /* CoreHaptics.framework in Frameworks */,
+				821F7EE9E2C264BE974354F3D10ED455 /* Metal.framework in Frameworks */,
+				D6672B16BEDCA07199C6FC656FC4082D /* MetalFX.framework in Frameworks */,
+				EDAA7B1644586D9700505C139B816A92 /* MetalKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		069184297F1B24F923FBAF43CA5BEF2A = {
+			isa = PBXGroup;
+			children = (
+				F5002C3234DCD045EA446E08F3F67EE7 /* BornlessRitual */,
+				8E0E4D9B3630D180D5481C43B6332E1D /* Packages */,
+				78EC8705D3592CDB0527A82F65D39DF3 /* Frameworks */,
+				B9DB3738AE5F36DEB1BC51E24E4745A7 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		6FDFA1BCDEECCFF056FBFB187DC27A72 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				8A16ECD0B2DE16E8C67668FE6B5F4D7B /* Assets.xcassets */,
+				8D0DD46CE76578B10C5307655BAD8DFE /* RitualText.json */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		78EC8705D3592CDB0527A82F65D39DF3 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				F5C20BE65803C4B96DA7CC9465F9CDE9 /* CoreHaptics.framework */,
+				FE0E38905D3369FDB40B4DFECA027013 /* Metal.framework */,
+				BB604F68489C09286FD316F915DAED09 /* MetalFX.framework */,
+				DBC63B7419993462192466ACABCB8DB4 /* MetalKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		8E0E4D9B3630D180D5481C43B6332E1D /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				1BBAA8C0F020C61C3091471DE08DD6CA /* RitualCore */,
+			);
+			path = Packages;
+			sourceTree = "<group>";
+		};
+		B9DB3738AE5F36DEB1BC51E24E4745A7 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				12702A86AC8BB4992C8B39B307A29904 /* BornlessRitual.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		BAB619D55D8B48210D735F25E742DF85 /* Shaders */ = {
+			isa = PBXGroup;
+			children = (
+				52466D879842561D4F9EAF0024D4F510 /* ShaderTypes.h */,
+			);
+			path = Shaders;
+			sourceTree = "<group>";
+		};
+		F5002C3234DCD045EA446E08F3F67EE7 /* BornlessRitual */ = {
+			isa = PBXGroup;
+			children = (
+				6FDFA1BCDEECCFF056FBFB187DC27A72 /* Resources */,
+				BAB619D55D8B48210D735F25E742DF85 /* Shaders */,
+				A3BB1B2725AA73F0B575045B6E56CB6D /* BornlessRitual-Bridging-Header.h */,
+				82A4C5BBEC818FF39529F002EC78032E /* Info.plist */,
+			);
+			path = BornlessRitual;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		78646A42C1F2E62B45547DDFA74D6ABF /* BornlessRitual */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EA7BB1AB5BB97D32637FDA9E93B332D5 /* Build configuration list for PBXNativeTarget "BornlessRitual" */;
+			buildPhases = (
+				22DED4B6D0CF0381609CB360C765D43D /* Sources */,
+				350396C1D35F626E45AB8E128EF30AB1 /* Frameworks */,
+				372C20ADB8668AC06B513E8C7FABFE94 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = BornlessRitual;
+			packageProductDependencies = (
+				77F6E3FC7D51B845F209AD09F6E5EE12 /* RitualCore */,
+			);
+			productName = BornlessRitual;
+			productReference = 12702A86AC8BB4992C8B39B307A29904 /* BornlessRitual.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		C1B479E6618433A53557D8AFA403A82F /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					78646A42C1F2E62B45547DDFA74D6ABF = {
+						CreatedOnToolsVersion = 15.0;
+					};
+				};
+			};
+			buildConfigurationList = D36CCABCDBD4D1EF9F7079D723CCDF7A /* Build configuration list for PBXProject "BornlessRitual" */;
+			compatibilityVersion = "Xcode 15.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 069184297F1B24F923FBAF43CA5BEF2A;
+			packageReferences = (
+				B559A1513350DA232F7A7C8C9B4A92AF /* XCLocalSwiftPackageReference "RitualCore" */,
+			);
+			productRefGroup = B9DB3738AE5F36DEB1BC51E24E4745A7 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				78646A42C1F2E62B45547DDFA74D6ABF /* BornlessRitual */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		372C20ADB8668AC06B513E8C7FABFE94 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BB6AF6465E51D417BC3A1E8D4819BA4C /* Assets.xcassets in Resources */,
+				8DCDC3BD74282C6C92C1FB47B1159081 /* RitualText.json in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		22DED4B6D0CF0381609CB360C765D43D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		68399135987B472D6FA956D8F1CDEEE3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GENERATE_INFOPLIST_FILE = NO;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/BornlessRitual/Shaders",
+				);
+				INFOPLIST_FILE = BornlessRitual/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				MTL_HEADER_SEARCH_PATHS = "$(inherited) $(SRCROOT)/BornlessRitual/Shaders";
+				MTL_LANGUAGE_REVISION = Metal31;
+				PRODUCT_BUNDLE_IDENTIFIER = com.bornless.ritual;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "BornlessRitual/BornlessRitual-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_STRICT_CONCURRENCY = minimal;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		7479F31D9A02E1E88D3E76B5474A1D33 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/BornlessRitual/Shaders",
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				MTL_HEADER_SEARCH_PATHS = "$(inherited) $(SRCROOT)/BornlessRitual/Shaders";
+				MTL_LANGUAGE_REVISION = Metal31;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_STRICT_CONCURRENCY = minimal;
+				SWIFT_VERSION = 5.0;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		761E009117D93E6D5B30E365BD5619A6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GENERATE_INFOPLIST_FILE = NO;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/BornlessRitual/Shaders",
+				);
+				INFOPLIST_FILE = BornlessRitual/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				MTL_HEADER_SEARCH_PATHS = "$(inherited) $(SRCROOT)/BornlessRitual/Shaders";
+				MTL_LANGUAGE_REVISION = Metal31;
+				PRODUCT_BUNDLE_IDENTIFIER = com.bornless.ritual;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "BornlessRitual/BornlessRitual-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_STRICT_CONCURRENCY = minimal;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		F5B5283434CE1FAC019F90DA419199C5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/BornlessRitual/Shaders",
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				MTL_HEADER_SEARCH_PATHS = "$(inherited) $(SRCROOT)/BornlessRitual/Shaders";
+				MTL_LANGUAGE_REVISION = Metal31;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_STRICT_CONCURRENCY = minimal;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		D36CCABCDBD4D1EF9F7079D723CCDF7A /* Build configuration list for PBXProject "BornlessRitual" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F5B5283434CE1FAC019F90DA419199C5 /* Debug */,
+				7479F31D9A02E1E88D3E76B5474A1D33 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		EA7BB1AB5BB97D32637FDA9E93B332D5 /* Build configuration list for PBXNativeTarget "BornlessRitual" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				761E009117D93E6D5B30E365BD5619A6 /* Debug */,
+				68399135987B472D6FA956D8F1CDEEE3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		B559A1513350DA232F7A7C8C9B4A92AF /* XCLocalSwiftPackageReference "RitualCore" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/RitualCore;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		77F6E3FC7D51B845F209AD09F6E5EE12 /* RitualCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B559A1513350DA232F7A7C8C9B4A92AF /* XCLocalSwiftPackageReference "RitualCore" */;
+			productName = RitualCore;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = C1B479E6618433A53557D8AFA403A82F /* Project object */;
+}

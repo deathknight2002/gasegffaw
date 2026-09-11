@@ -1,313 +1,365 @@
 {
-  "editions": {
-    "goodwin1852": {
-      "title": "Fragment of a Græco-Egyptian Work upon Magic, from a Papyrus in the British Museum",
-      "translator": "Charles Wycliffe Goodwin",
-      "year": 1852,
-      "url": "https://archive.org/details/publications00verogoog",
-      "publicDomain": true
-    },
-    "samekh1930": {
-      "title": "Liber Samekh",
-      "author": "Aleister Crowley",
-      "year": 1930,
-      "url": "https://archive.org/details/b29825064",
-      "publicDomain": true
-    }
+ "editions": {
+  "goodwin1852": {
+   "title": "Fragment of a Græco-Egyptian Work upon Magic, from a Papyrus in the British Museum",
+   "translator": "Charles Wycliffe Goodwin",
+   "year": 1852,
+   "url": "https://archive.org/details/publications00verogoog",
+   "publicDomain": true
   },
-  "stages": [
-    {
-      "id": "opening",
-      "title": "The Oath",
-      "element": null,
-      "quarter": null,
-      "lines": {
-        "goodwin1852": [
-          "I call thee, the headless one, that didst create earth and heaven, that didst create night and day, thee the creator of light and darkness.",
-          "Thou art Osoronnophris, whom no man hath seen at any time;",
-          "thou art Iabas, thou art Iapōs,",
-          "thou hast distinguished the just and the unjust,",
-          "thou didst make female and male,",
-          "thou didst produce seeds and fruits,",
-          "thou didst make men to love one another and to hate one another.",
-          "I am Moses thy prophet, to whom thou didst commit thy mysteries, the ceremonies of Israel;",
-          "thou didst produce the moist and the dry and all manner of food.",
-          "Listen to me: I am an angel of Phapro Osoronnophris; this is thy true name, handed down to the prophets of Israel."
-        ],
-        "samekh1930": [
-          "Thee I invoke, the Bornless One.",
-          "Thee, that didst create the Earth and the Heavens.",
-          "Thee, that didst create the Night and the Day.",
-          "Thee, that didst create the darkness and the Light.",
-          "Thou art ASAR UN-NEFER (\"Myself made Perfect\"): Whom no man hath seen at any time.",
-          "Thou art IA-BESZ (\"the Truth in Matter\").",
-          "Thou art IA-APOPHRASZ (\"the Truth in Motion\").",
-          "Thou hast distinguished between the Just and the Unjust.",
-          "Thou didst make the Female and the Male.",
-          "Thou didst produce the Seeds and the Fruit.",
-          "Thou didst form Men to love one another, and to hate one another.",
-          "I am ANKH-F-N-KHONSU thy Prophet, unto Whom Thou didst commit Thy Mysteries, the Ceremonies of KHEM.",
-          "Thou didst produce the moist and the dry, and that which nourisheth all created Life.",
-          "Hear Thou Me, for I am the Angel of PTAH-APO-PHRASZ-RA (vide the Rubric): this is Thy True Name, handed down to the Prophets of KHEM."
-        ]
-      },
-      "barbarousNames": [
-        "ASAR UN-NEFER",
-        "IA-BESZ",
-        "IA-APOPHRASZ",
-        "PTAH-APO-PHRASZ-RA"
-      ]
-    },
-    {
-      "id": "air",
-      "title": "Air — East",
-      "element": "air",
-      "quarter": "east",
-      "lines": {
-        "goodwin1852": [
-          "Listen to me, . . . . . . . . hear me and drive away this spirit."
-        ],
-        "samekh1930": [
-          "Hear Me: —",
-          "AR — \"O breathing, flowing Sun!\"",
-          "ThIAF — \"O Sun IAF! O Lion-Serpent Sun, The Beast that whirlest forth, a thunderbolt, begetter of Life!\"",
-          "RhEIBET — \"Thou that flowest! Thou that goest!\"",
-          "A-ThELE-BER-SET — \"Thou Satan-Sun Hadith that goest without Will!\"",
-          "A — \"Thou Air! Breath! Spirit! Thou without bound or bond!\"",
-          "BELAThA — \"Thou Essence, Air Swift-streaming, Elasticity!\"",
-          "ABEU — \"Thou Wanderer, Father of All!\"",
-          "EBEU — \"Thou Wanderer, Spirit of All!\"",
-          "PhI-ThETA-SOE — \"Thou Shining Force of Breath! Thou Lion-Serpent Sun! Thou Saviour, save!\"",
-          "IB — \"Thou Ibis, secret solitary Bird, inviolate Wisdom, whose Word is Truth, creating the World by its Magick!\"",
-          "ThIAF — \"O Sun IAF! O Lion-Serpent Sun, The Beast that whirlest forth, a thunderbolt, begetter of Life!\"",
-          "(The conception is of Air, glowing, inhabited by a Solar-Phallic Bird, \"the Holy Ghost\", of a Mercurial Nature.)",
-          "Hear me, and make all Spirits subject unto Me; so that every Spirit of the Firmament and of the Ether: upon the Earth and under the Earth, on dry land and in the water; of Whirling Air, and of rushing Fire, and every Spell and Scourge of God may be obedient unto Me."
-        ]
-      },
-      "barbarousNames": [
-        "AR",
-        "ThIAF",
-        "RhEIBET",
-        "A-ThELE-BER-SET",
-        "A",
-        "BELAThA",
-        "ABEU",
-        "EBEU",
-        "PhI-ThETA-SOE",
-        "IB",
-        "ThIAF"
-      ]
-    },
-    {
-      "id": "fire",
-      "title": "Fire — South",
-      "element": "fire",
-      "quarter": "south",
-      "lines": {
-        "goodwin1852": [
-          "I call thee the terrible and invisible god residing in the empty wind, . . . . . . . .",
-          "thou headless one, deliver such an one from the spirit that possesses him."
-        ],
-        "samekh1930": [
-          "I invoke Thee, the Terrible and Invisible God: Who dwellest in the Void Place of the Spirit: —",
-          "AR-O-GO-GO-RU-ABRAO — \"Thou spiritual Sun! Satan, Thou Eye, Thou Lust! Cry aloud! Cry aloud! Whirl the Wheel, O my Father, O Satan, O Sun!\"",
-          "SOTOU — \"Thou, the Saviour!\"",
-          "MUDORIO — \"Silence! Give me Thy Secret!\"",
-          "PhALARThAO — \"Give me suck, Thou Phallus, Thou Sun!\"",
-          "OOO — \"Satan, thou Eye, thou Lust!\" \"Satan, thou Eye, thou Lust!\" \"Satan, thou Eye, thou Lust!\"",
-          "AEPE — \"Thou self-caused, self-determined, exalted, Most High!\"",
-          "The Bornless One. (Vide supra).",
-          "(The conception is of Fire, glowing, inhabited by a Solar-Phallic Lion of a Uranian nature.)",
-          "Hear Me, and make all Spirits subject unto Me: so that every Spirit of the Firmament and of the Ether: upon the Earth and under the Earth: on dry Land and in the Water: of Whirling Air, and of rushing Fire, and every Spell and Scourge of God may be obedient unto Me."
-        ]
-      },
-      "barbarousNames": [
-        "AR-O-GO-GO-RU-ABRAO",
-        "SOTOU",
-        "MUDORIO",
-        "PhALARThAO",
-        "OOO",
-        "AEPE"
-      ]
-    },
-    {
-      "id": "water",
-      "title": "Water — West",
-      "element": "water",
-      "quarter": "west",
-      "lines": {
-        "goodwin1852": [
-          ". . . . . . . . strong one, headless one, deliver such an one from the spirit that possesses him."
-        ],
-        "samekh1930": [
-          "Hear Me: —",
-          "RU-ABRA-IAF — \"Thou the Wheel, thou the Womb, that containeth the Father IAF!\"",
-          "MRIODOM — \"Thou the Sea, the Abode!\"",
-          "BABALON-BAL-BIN-ABAFT — \"Babalon! Thou Woman of Whoredom!\" \"Thou, Gate of the Great God ON! Thou Lady of the Understanding of the Ways!\"",
-          "ASAL-ON-AI — \"Hail Thou, the unstirred! Hail, sister and bride of ON, of the God that is all and is none, by the Power of Eleven!\"",
-          "APhEN-IAF — \"Thou Treasure of IAO!\"",
-          "I — \"Thou Virgin twin-sexed! Thou Secret Seed! Thou inviolate Wisdom!\"",
-          "PhOTETh — \"Abode of the Light . . .\"",
-          "ABRASAX — \". . . of the Father, the Sun, of Hadith, of the spell of the Aeon of Horus!\"",
-          "AEOOU — \"Our Lady of the Western Gate of Heaven!\"",
-          "ISChURE — \"Mighty art Thou!\"",
-          "Mighty and Bornless One! (Vide Supra)",
-          "(The conception is of Water, glowing, inhabited by a Solar-Phallic Dragon-Serpent, of a Neptunian nature.)",
-          "Hear Me: and make all Spirits subject unto Me: so that every Spirit of the Firmament and of the Ether: upon the Earth and under the Earth: on dry Land and in the Water: of Whirling Air, and of rushing Fire: and every Spell and Scourge of God may be obedient unto Me."
-        ]
-      },
-      "barbarousNames": [
-        "RU-ABRA-IAF",
-        "MRIODOM",
-        "BABALON-BAL-BIN-ABAFT",
-        "ASAL-ON-AI",
-        "APhEN-IAF",
-        "I",
-        "PhOTETh",
-        "ABRASAX",
-        "AEOOU",
-        "ISChURE"
-      ]
-    },
-    {
-      "id": "earth",
-      "title": "Earth — North",
-      "element": "earth",
-      "quarter": "north",
-      "lines": {
-        "goodwin1852": [
-          ". . . . . . . . deliver such an one"
-        ],
-        "samekh1930": [
-          "I invoke Thee: —",
-          "MA — \"O Mother! O Truth!\"",
-          "BARRAIO — \"Thou Mass!\"",
-          "IOEL — \"Hail, Thou that art!\"",
-          "KOThA — \"Thou hollow one!\"",
-          "AThOR-e-BAL-O — \"Thou Goddess of Beauty and Love, whom Satan, beholding, desireth!\"",
-          "ABRAFT — \"The Fathers, male-female, desire Thee!\"",
-          "(The conception is of Earth, glowing, inhabited by a Solar-Phallic Hippopotamus of a Venereal nature.)",
-          "Hear Me: and make all Spirits subject unto Me: so that every Spirit of the Firmament, and of the Ether: upon The Earth and under the Earth: on dry land and in the Water: of Whirling Air, and of rushing Fire: and every Spell and Scourge of God may be obedient unto Me."
-        ]
-      },
-      "barbarousNames": [
-        "MA",
-        "BARRAIO",
-        "IOEL",
-        "KOThA",
-        "AThOR-e-BAL-O",
-        "ABRAFT"
-      ]
-    },
-    {
-      "id": "spirit",
-      "title": "Spirit",
-      "element": "spirit",
-      "quarter": null,
-      "lines": {
-        "goodwin1852": [
-          ". . . . . . . . This is the lord of the gods, this is the lord of the world, this is he whom the winds fear, this is he who made voice by his commandment, lord of all things, king, ruler, helper, save this soul . . . . . . . .",
-          ". . . . . . . . angel of God . . . . . . . ."
-        ],
-        "samekh1930": [
-          "Hear Me:",
-          "AFT — \"Male-Female Spirits!\"",
-          "ABAFT — \"Male-Female Sires!\"",
-          "BAS-AUMGN — \"Ye that are Gods, going forth, uttering AUMGN. (The Word that goeth from (A) Free Breath. (U) through Willed Breath. (M) and Stopped Breath. (GN) to Continuous Breath, thus symbolizing the whole course of spiritual life. A is the formless Hero; U is the six-fold solar sound of physical life, the triangle of Soul being entwined with that of Body; M is the silence of \"death\"; GN is the nasal sound of generation & knowledge.)\"",
-          "ISAK — \"Identical Point!\"",
-          "SA-BA-FT — \"Nuith! Hadith! Ra-Hoor-Khuit!\" \"Hail, Great Wild Beast!\" \"Hail, I A O!\"",
-          "This is the Lord of the Gods:",
-          "This is the Lord of the Universe:",
-          "This is He whom the Winds fear.",
-          "This is He, Who having made Voice by His commandment is Lord of all Things; King, Ruler and Helper.",
-          "Hear Me, and make all Spirits subject unto Me: so that every Spirit of the Firmament and of the Ether: upon the Earth and under the Earth: on dry Land and in the Water: of Whirling Air, and of rushing Fire: and every Spell and Scourge of God may be obedient unto Me.",
-          "Hear Me: —",
-          "IEOU — \"Indwelling Sun of Myself\"",
-          "PUR — \"Thou Fire! Thou Sixfold Star initiator compassed about with Force and Fire!\"",
-          "IOU — \"Indwelling Soul of Myself\"",
-          "PUR — (Vide Supra)",
-          "IAFTh — \"Sun-lion Serpent, hail! All Hail, thou Great Wild Beast, thou I A O!\"",
-          "IAEO — \"Breaths of my Soul, breaths of mine Angel.\"",
-          "IOOU — \"Lust of my Soul, lust of mine Angel!\"",
-          "ABRASAX — (Vide Supra).",
-          "SABRIAM — \"Ho for the Sangraal! Ho for the Cup of Babalon! Ho for mine Angel pouring Himself forth within my Soul!\"",
-          "OO — \"The Eye! Satan, my Lord! The Lust of the Goat!\"",
-          "FF — \"Mine Angel! Mine initiator! Thou one with me — the Sixfold Star!\"",
-          "AD-ON-A-I — \"My Lord! My secret self beyond self, Hadith, All Father! Hail, ON, thou Sun, thou Life of Man, thou Fivefold Sword of Flame! Thou Goat exalted upon Earth in Lust, thou Snake extended upon Earth in Life! Spirit most holy! Seed most Wise! Innocent Babe. Inviolate Maid! Begetter of Being! Soul of all Souls! Word of all Words, Come forth, most hidden Light!\"",
-          "EDE — \"Devour thou me!\"",
-          "EDU — \"Thou dost devour Me!\"",
-          "ANGELOS TON ThEON — \"Thou Angel of the Gods!\"",
-          "ANLALA — \"Arise thou in Me, free flowing, Thou who art Naught, who art Naught, and utter thy Word!\"",
-          "LAI — \"I also am Naught! I Will Thee! I behold Thee! My nothingness!\"",
-          "GAIA — \"Leap up, thou Earth!\" (This is also an agonising appeal to the Earth, the Mother; for at this point of the ceremony the Adept should be torn from his mortal attachments, and die to himself in the orgasm of his operation.)",
-          "AEPE — \"Thou Exalted One! It (i.e. the spiritual 'semen', the Adept's secret ideas, drawn irresistibly from their \"Hell\" by the love of his Angel) leaps up; it leaps forth!\"",
-          "DIATHARNA THORON — \"Lo! the out-splashing of the seeds of Immortality!\""
-        ]
-      },
-      "barbarousNames": [
-        "AFT",
-        "ABAFT",
-        "BAS-AUMGN",
-        "ISAK",
-        "SA-BA-FT",
-        "IAF"
-      ]
-    },
-    {
-      "id": "climax",
-      "title": "I am He, the Bornless Spirit",
-      "element": null,
-      "quarter": null,
-      "lines": {
-        "goodwin1852": [
-          "I am the headless spirit, having sight in my feet, strong, the immortal fire;",
-          "I am the truth;",
-          "I am he that hateth that ill-deeds should be done in the world;",
-          "I am he that lighteneth and thundereth;",
-          "I am he whose sweat is the shower that falleth upon the earth that it may teem;",
-          "I am he whose mouth ever burneth;",
-          "I am the begetter and the bringer forth (?);",
-          "I am the Grace of the World;",
-          "my name is the heart girt with a serpent."
-        ],
-        "samekh1930": [
-          "I am He! the Bornless Spirit! having sight in the feet: Strong, and the Immortal Fire!",
-          "I am He! the Truth!",
-          "I am He! Who hate that evil should be wrought in the World!",
-          "I am He, that lighteneth and thundereth!",
-          "I am He, from whom is the Shower of the Life of Earth!",
-          "I am He, whose mouth ever flameth!",
-          "I am He, the Begetter and Manifester unto the Light!",
-          "I am He, The Grace of the Worlds!",
-          "\"The Heart Girt with a Serpent\" is my name!"
-        ]
-      },
-      "barbarousNames": []
-    },
-    {
-      "id": "closing",
-      "title": "Such are the Words",
-      "element": null,
-      "quarter": null,
-      "lines": {
-        "goodwin1852": [
-          "Come forth and follow.",
-          "—The celebration of the preceding ceremony.—",
-          "Write the names upon a piece of new paper, and having extended it over your forehead from one temple to the other, address yourself turning towards the north to the six names, saying:—",
-          "Make all the spirits subject to me, so that every spirit of heaven and of the air, upon the earth and under the earth, on dry land and in the water, and every spell and scourge of God, may be obedient to me.—",
-          "And all the spirits shall be obedient to you. . . . . . . . ."
-        ],
-        "samekh1930": [
-          "Come thou forth, and follow me: and make all Spirits subject unto Me so that every Spirit of the Firmament, and of the Ether, upon the Earth and under the Earth: on dry Land, or in the Water: of Whirling Air or of rushing Fire, and every Spell and Scourge of God, may be obedient unto me!",
-          "IAF: SABAF",
-          "Such are the Words!"
-        ]
-      },
-      "barbarousNames": [
-        "IAF",
-        "SABAF"
-      ]
-    }
-  ],
-  "notes": "GOODWIN 1852. C. W. Goodwin (ed. & tr.), Fragment of a Græco-Egyptian Work upon Magic, from a Papyrus in the British Museum (Publications of the Cambridge Antiquarian Society, Octavo Series No. II; Cambridge: Deighton; Macmillan; 1852), section '4. An address to the god drawn upon the letter', English pp. 7 and 9 (Greek pp. 6 and 8). Transcribed from the Internet Archive OCR of the Google-digitised University of California copy (https://archive.org/stream/publications00verogoog/publications00verogoog_djvu.txt) and checked word by word against the page images of the same item's PDF (leaves 88-91). Goodwin left the Barbarous Names untranslated: in his English they stand as rows of dots, reproduced here as '. . . . . . . .'; the names appear only in his Greek text (listed in docs/SOURCES.md). Goodwin has no elemental headings, so his passages were aligned with Liber Samekh by the names that surround them in the Greek. He gives the 'Make all the spirits subject to me' formula once, at the end (Samekh repeats it after every section); it is placed in the closing stage. SAMEKH 1930. Aleister Crowley, Liber Samekh (Theurgia Goetia Summa, sub figura DCCC), Appendix IV of Magick in Theory and Practice (Paris: Lecram Press, title page dated 1929, issued 1929/30), Point I 'Evangelii Textus Redactus', pp. 265-273. Transcribed from the archive.org e-text (https://archive.org/details/MagickInTheoryAndPracticeAleisterCrowley) and corrected against page images of the 1929 first edition served by Wellcome Collection IIIF (https://iiif.wellcomecollection.org/presentation/v2/b29825064, canvases 0302-0309 = pp. 266-273). First-edition readings restored: 'whose Word is Truth' (e-texts: 'in Truth'); 'The Beast that whirlest forth' (e-text: 'Beas'). The printer's slip 'upon the Earth und under the Earth' (p. 273) is given as 'and'; the line-end hyphenation 'thunder-|bolt' as 'thunderbolt'; French-style spaces before '!' and spaced hyphens inside names (ANKH - F - N - KHONSU) are closed up; footnote markers and footnotes are omitted. The essential footnote (p. 267 n. 1) reads: 'The letter F is used to represent the Hebrew Vau and the Greek Digamma; its sound lies between those of the English long o and long oo, as in Rope and Tooth.' Each Barbarous Name is followed by an em-dash and Crowley's quoted paraphrase, which the 1929 edition sets in a second column; '(Vide Supra)' lines are his cross-references. STAGE MAPPING (1929 section labels): opening = Section A 'The Oath' + Section Aa; air = Section B 'Air'; fire = Section C 'Fire'; water = Section D 'Water'; earth = Section E 'Earth'; spirit = Section F 'Spirit' + Section Ff + Section G 'Spirit'; climax = Section Gg 'The Attainment'; closing = Section H 'The Charge to the Spirit' + Section J 'The Proclamation of the Beast 666'. Quarters follow Point II (Section B 'invokes Air in the East'; C 'Fire in the South'; D 'Water in the West'; E 'goes to the North to invoke Earth'; F 'facing toward Boleskine'). The labels 'Aa/Ee/Ii/Oo/Uu' sometimes used for the elemental sections do not occur in the 1929 edition, where 'Section Aa' is the second half of the Oath. BARBAROUS NAMES use the 1929 Samekh orthography (Th, Ph, Ch; F = Vau/digamma, so ThIAF = Thiao, ABRAFT = Abraoth, IAF = IAO). They were checked against Goodwin's Greek: air ar, thiao, reibet, atheleberseth, a, blatha, abeu, ebeu, phi, chitasoe, ib, thiao (Samekh fuses 'phi, chitasoe' into PhI-ThETA-SOE); fire arogogorobrao, sochou, modorio, phalarchao, ooo, ape; water roubriao, mariodam, balbnabaoth, assalonai, aphniao, i, tholeth, abrasax, aeoou, ischure; earth ma, barraio, ioel, kotha, athorebalo, abraoth; spirit aoth, abaoth, basum, isak, sabaoth, iao. The spirit stage keeps six beats: Goodwin's Greek has six names and his rubric says 'the six names' (p. 9); Samekh prints five entries (AFT, ABAFT, BAS-AUMGN, ISAK, SA-BA-FT) and carries the sixth, iao, only inside the gloss of SA-BA-FT ('Hail, I A O!'); it is supplied here as IAF, Crowley's spelling of the same word in Section J ('IAF : SABAF' = iao sabaoth)."
+  "samekh1930": {
+   "title": "Liber Samekh",
+   "author": "Aleister Crowley",
+   "year": 1930,
+   "url": "https://archive.org/details/b29825064",
+   "publicDomain": true
+  }
+ },
+ "stages": [
+  {
+   "id": "opening",
+   "title": "The Oath",
+   "element": null,
+   "quarter": null,
+   "lines": {
+    "goodwin1852": [
+     "I call thee, the headless one, that didst create earth and heaven, that didst create night and day, thee the creator of light and darkness.",
+     "Thou art Osoronnophris, whom no man hath seen at any time;",
+     "thou art Iabas, thou art Iapōs,",
+     "thou hast distinguished the just and the unjust,",
+     "thou didst make female and male,",
+     "thou didst produce seeds and fruits,",
+     "thou didst make men to love one another and to hate one another.",
+     "I am Moses thy prophet, to whom thou didst commit thy mysteries, the ceremonies of Israel;",
+     "thou didst produce the moist and the dry and all manner of food.",
+     "Listen to me: I am an angel of Phapro Osoronnophris; this is thy true name, handed down to the prophets of Israel."
+    ],
+    "samekh1930": [
+     "Thee I invoke, the Bornless One.",
+     "Thee, that didst create the Earth and the Heavens.",
+     "Thee, that didst create the Night and the Day.",
+     "Thee, that didst create the darkness and the Light.",
+     "Thou art ASAR UN-NEFER (\"Myself made Perfect\"): Whom no man hath seen at any time.",
+     "Thou art IA-BESZ (\"the Truth in Matter\").",
+     "Thou art IA-APOPHRASZ (\"the Truth in Motion\").",
+     "Thou hast distinguished between the Just and the Unjust.",
+     "Thou didst make the Female and the Male.",
+     "Thou didst produce the Seeds and the Fruit.",
+     "Thou didst form Men to love one another, and to hate one another.",
+     "I am ANKH-F-N-KHONSU thy Prophet, unto Whom Thou didst commit Thy Mysteries, the Ceremonies of KHEM.",
+     "Thou didst produce the moist and the dry, and that which nourisheth all created Life.",
+     "Hear Thou Me, for I am the Angel of PTAH-APO-PHRASZ-RA (vide the Rubric): this is Thy True Name, handed down to the Prophets of KHEM."
+    ]
+   },
+   "barbarousNames": [
+    "ASAR UN-NEFER",
+    "IA-BESZ",
+    "IA-APOPHRASZ",
+    "PTAH-APO-PHRASZ-RA"
+   ],
+   "barbarousNamesGoodwin": []
+  },
+  {
+   "id": "air",
+   "title": "Air — East",
+   "element": "air",
+   "quarter": "east",
+   "lines": {
+    "goodwin1852": [
+     "Listen to me, . . . . . . . . hear me and drive away this spirit."
+    ],
+    "samekh1930": [
+     "Hear Me: —",
+     "AR — \"O breathing, flowing Sun!\"",
+     "ThIAF — \"O Sun IAF! O Lion-Serpent Sun, The Beast that whirlest forth, a thunderbolt, begetter of Life!\"",
+     "RhEIBET — \"Thou that flowest! Thou that goest!\"",
+     "A-ThELE-BER-SET — \"Thou Satan-Sun Hadith that goest without Will!\"",
+     "A — \"Thou Air! Breath! Spirit! Thou without bound or bond!\"",
+     "BELAThA — \"Thou Essence, Air Swift-streaming, Elasticity!\"",
+     "ABEU — \"Thou Wanderer, Father of All!\"",
+     "EBEU — \"Thou Wanderer, Spirit of All!\"",
+     "PhI-ThETA-SOE — \"Thou Shining Force of Breath! Thou Lion-Serpent Sun! Thou Saviour, save!\"",
+     "IB — \"Thou Ibis, secret solitary Bird, inviolate Wisdom, whose Word is Truth, creating the World by its Magick!\"",
+     "ThIAF — \"O Sun IAF! O Lion-Serpent Sun, The Beast that whirlest forth, a thunderbolt, begetter of Life!\"",
+     "(The conception is of Air, glowing, inhabited by a Solar-Phallic Bird, \"the Holy Ghost\", of a Mercurial Nature.)",
+     "Hear me, and make all Spirits subject unto Me; so that every Spirit of the Firmament and of the Ether: upon the Earth and under the Earth, on dry land and in the water; of Whirling Air, and of rushing Fire, and every Spell and Scourge of God may be obedient unto Me."
+    ]
+   },
+   "barbarousNames": [
+    "AR",
+    "ThIAF",
+    "RhEIBET",
+    "A-ThELE-BER-SET",
+    "A",
+    "BELAThA",
+    "ABEU",
+    "EBEU",
+    "PhI-ThETA-SOE",
+    "IB",
+    "ThIAF"
+   ],
+   "barbarousNamesGoodwin": [
+    "Ar",
+    "Thiao",
+    "Reibet",
+    "Atheleberseth",
+    "A",
+    "Blatha",
+    "Abeu",
+    "Ebeu",
+    "Phi",
+    "Chitasoe",
+    "Ib",
+    "Thiao"
+   ]
+  },
+  {
+   "id": "fire",
+   "title": "Fire — South",
+   "element": "fire",
+   "quarter": "south",
+   "lines": {
+    "goodwin1852": [
+     "I call thee the terrible and invisible god residing in the empty wind, . . . . . . . .",
+     "thou headless one, deliver such an one from the spirit that possesses him."
+    ],
+    "samekh1930": [
+     "I invoke Thee, the Terrible and Invisible God: Who dwellest in the Void Place of the Spirit: —",
+     "AR-O-GO-GO-RU-ABRAO — \"Thou spiritual Sun! Satan, Thou Eye, Thou Lust! Cry aloud! Cry aloud! Whirl the Wheel, O my Father, O Satan, O Sun!\"",
+     "SOTOU — \"Thou, the Saviour!\"",
+     "MUDORIO — \"Silence! Give me Thy Secret!\"",
+     "PhALARThAO — \"Give me suck, Thou Phallus, Thou Sun!\"",
+     "OOO — \"Satan, thou Eye, thou Lust!\" \"Satan, thou Eye, thou Lust!\" \"Satan, thou Eye, thou Lust!\"",
+     "AEPE — \"Thou self-caused, self-determined, exalted, Most High!\"",
+     "The Bornless One. (Vide supra).",
+     "(The conception is of Fire, glowing, inhabited by a Solar-Phallic Lion of a Uranian nature.)",
+     "Hear Me, and make all Spirits subject unto Me: so that every Spirit of the Firmament and of the Ether: upon the Earth and under the Earth: on dry Land and in the Water: of Whirling Air, and of rushing Fire, and every Spell and Scourge of God may be obedient unto Me."
+    ]
+   },
+   "barbarousNames": [
+    "AR-O-GO-GO-RU-ABRAO",
+    "SOTOU",
+    "MUDORIO",
+    "PhALARThAO",
+    "OOO",
+    "AEPE"
+   ],
+   "barbarousNamesGoodwin": [
+    "Arogogorobrao",
+    "Sochou",
+    "Modorio",
+    "Phalarchao",
+    "Ooo",
+    "Ape"
+   ]
+  },
+  {
+   "id": "water",
+   "title": "Water — West",
+   "element": "water",
+   "quarter": "west",
+   "lines": {
+    "goodwin1852": [
+     ". . . . . . . . strong one, headless one, deliver such an one from the spirit that possesses him."
+    ],
+    "samekh1930": [
+     "Hear Me: —",
+     "RU-ABRA-IAF — \"Thou the Wheel, thou the Womb, that containeth the Father IAF!\"",
+     "MRIODOM — \"Thou the Sea, the Abode!\"",
+     "BABALON-BAL-BIN-ABAFT — \"Babalon! Thou Woman of Whoredom!\" \"Thou, Gate of the Great God ON! Thou Lady of the Understanding of the Ways!\"",
+     "ASAL-ON-AI — \"Hail Thou, the unstirred! Hail, sister and bride of ON, of the God that is all and is none, by the Power of Eleven!\"",
+     "APhEN-IAF — \"Thou Treasure of IAO!\"",
+     "I — \"Thou Virgin twin-sexed! Thou Secret Seed! Thou inviolate Wisdom!\"",
+     "PhOTETh — \"Abode of the Light . . .\"",
+     "ABRASAX — \". . . of the Father, the Sun, of Hadith, of the spell of the Aeon of Horus!\"",
+     "AEOOU — \"Our Lady of the Western Gate of Heaven!\"",
+     "ISChURE — \"Mighty art Thou!\"",
+     "Mighty and Bornless One! (Vide Supra)",
+     "(The conception is of Water, glowing, inhabited by a Solar-Phallic Dragon-Serpent, of a Neptunian nature.)",
+     "Hear Me: and make all Spirits subject unto Me: so that every Spirit of the Firmament and of the Ether: upon the Earth and under the Earth: on dry Land and in the Water: of Whirling Air, and of rushing Fire: and every Spell and Scourge of God may be obedient unto Me."
+    ]
+   },
+   "barbarousNames": [
+    "RU-ABRA-IAF",
+    "MRIODOM",
+    "BABALON-BAL-BIN-ABAFT",
+    "ASAL-ON-AI",
+    "APhEN-IAF",
+    "I",
+    "PhOTETh",
+    "ABRASAX",
+    "AEOOU",
+    "ISChURE"
+   ],
+   "barbarousNamesGoodwin": [
+    "Roubriao",
+    "Mariodam",
+    "Balbnabaoth",
+    "Assalonai",
+    "Aphniao",
+    "I",
+    "Tholeth",
+    "Abrasax",
+    "Aeoou"
+   ]
+  },
+  {
+   "id": "earth",
+   "title": "Earth — North",
+   "element": "earth",
+   "quarter": "north",
+   "lines": {
+    "goodwin1852": [
+     ". . . . . . . . deliver such an one"
+    ],
+    "samekh1930": [
+     "I invoke Thee: —",
+     "MA — \"O Mother! O Truth!\"",
+     "BARRAIO — \"Thou Mass!\"",
+     "IOEL — \"Hail, Thou that art!\"",
+     "KOThA — \"Thou hollow one!\"",
+     "AThOR-e-BAL-O — \"Thou Goddess of Beauty and Love, whom Satan, beholding, desireth!\"",
+     "ABRAFT — \"The Fathers, male-female, desire Thee!\"",
+     "(The conception is of Earth, glowing, inhabited by a Solar-Phallic Hippopotamus of a Venereal nature.)",
+     "Hear Me: and make all Spirits subject unto Me: so that every Spirit of the Firmament, and of the Ether: upon The Earth and under the Earth: on dry land and in the Water: of Whirling Air, and of rushing Fire: and every Spell and Scourge of God may be obedient unto Me."
+    ]
+   },
+   "barbarousNames": [
+    "MA",
+    "BARRAIO",
+    "IOEL",
+    "KOThA",
+    "AThOR-e-BAL-O",
+    "ABRAFT"
+   ],
+   "barbarousNamesGoodwin": [
+    "Ma",
+    "Barraio",
+    "Ioel",
+    "Kotha",
+    "Athorebalo",
+    "Abraoth"
+   ]
+  },
+  {
+   "id": "spirit",
+   "title": "Spirit",
+   "element": "spirit",
+   "quarter": null,
+   "lines": {
+    "goodwin1852": [
+     ". . . . . . . . This is the lord of the gods, this is the lord of the world, this is he whom the winds fear, this is he who made voice by his commandment, lord of all things, king, ruler, helper, save this soul . . . . . . . .",
+     ". . . . . . . . angel of God . . . . . . . ."
+    ],
+    "samekh1930": [
+     "Hear Me:",
+     "AFT — \"Male-Female Spirits!\"",
+     "ABAFT — \"Male-Female Sires!\"",
+     "BAS-AUMGN — \"Ye that are Gods, going forth, uttering AUMGN. (The Word that goeth from (A) Free Breath. (U) through Willed Breath. (M) and Stopped Breath. (GN) to Continuous Breath, thus symbolizing the whole course of spiritual life. A is the formless Hero; U is the six-fold solar sound of physical life, the triangle of Soul being entwined with that of Body; M is the silence of \"death\"; GN is the nasal sound of generation & knowledge.)\"",
+     "ISAK — \"Identical Point!\"",
+     "SA-BA-FT — \"Nuith! Hadith! Ra-Hoor-Khuit!\" \"Hail, Great Wild Beast!\" \"Hail, I A O!\"",
+     "This is the Lord of the Gods:",
+     "This is the Lord of the Universe:",
+     "This is He whom the Winds fear.",
+     "This is He, Who having made Voice by His commandment is Lord of all Things; King, Ruler and Helper.",
+     "Hear Me, and make all Spirits subject unto Me: so that every Spirit of the Firmament and of the Ether: upon the Earth and under the Earth: on dry Land and in the Water: of Whirling Air, and of rushing Fire: and every Spell and Scourge of God may be obedient unto Me.",
+     "Hear Me: —",
+     "IEOU — \"Indwelling Sun of Myself\"",
+     "PUR — \"Thou Fire! Thou Sixfold Star initiator compassed about with Force and Fire!\"",
+     "IOU — \"Indwelling Soul of Myself\"",
+     "PUR — (Vide Supra)",
+     "IAFTh — \"Sun-lion Serpent, hail! All Hail, thou Great Wild Beast, thou I A O!\"",
+     "IAEO — \"Breaths of my Soul, breaths of mine Angel.\"",
+     "IOOU — \"Lust of my Soul, lust of mine Angel!\"",
+     "ABRASAX — (Vide Supra).",
+     "SABRIAM — \"Ho for the Sangraal! Ho for the Cup of Babalon! Ho for mine Angel pouring Himself forth within my Soul!\"",
+     "OO — \"The Eye! Satan, my Lord! The Lust of the Goat!\"",
+     "FF — \"Mine Angel! Mine initiator! Thou one with me — the Sixfold Star!\"",
+     "AD-ON-A-I — \"My Lord! My secret self beyond self, Hadith, All Father! Hail, ON, thou Sun, thou Life of Man, thou Fivefold Sword of Flame! Thou Goat exalted upon Earth in Lust, thou Snake extended upon Earth in Life! Spirit most holy! Seed most Wise! Innocent Babe. Inviolate Maid! Begetter of Being! Soul of all Souls! Word of all Words, Come forth, most hidden Light!\"",
+     "EDE — \"Devour thou me!\"",
+     "EDU — \"Thou dost devour Me!\"",
+     "ANGELOS TON ThEON — \"Thou Angel of the Gods!\"",
+     "ANLALA — \"Arise thou in Me, free flowing, Thou who art Naught, who art Naught, and utter thy Word!\"",
+     "LAI — \"I also am Naught! I Will Thee! I behold Thee! My nothingness!\"",
+     "GAIA — \"Leap up, thou Earth!\" (This is also an agonising appeal to the Earth, the Mother; for at this point of the ceremony the Adept should be torn from his mortal attachments, and die to himself in the orgasm of his operation.)",
+     "AEPE — \"Thou Exalted One! It (i.e. the spiritual 'semen', the Adept's secret ideas, drawn irresistibly from their \"Hell\" by the love of his Angel) leaps up; it leaps forth!\"",
+     "DIATHARNA THORON — \"Lo! the out-splashing of the seeds of Immortality!\""
+    ]
+   },
+   "barbarousNames": [
+    "AFT",
+    "ABAFT",
+    "BAS-AUMGN",
+    "ISAK",
+    "SA-BA-FT",
+    "IAF"
+   ],
+   "barbarousNamesGoodwin": [
+    "Aoth",
+    "Abaoth",
+    "Basum",
+    "Isak",
+    "Sabaoth",
+    "Iao"
+   ]
+  },
+  {
+   "id": "climax",
+   "title": "I am He, the Bornless Spirit",
+   "element": null,
+   "quarter": null,
+   "lines": {
+    "goodwin1852": [
+     "I am the headless spirit, having sight in my feet, strong, the immortal fire;",
+     "I am the truth;",
+     "I am he that hateth that ill-deeds should be done in the world;",
+     "I am he that lighteneth and thundereth;",
+     "I am he whose sweat is the shower that falleth upon the earth that it may teem;",
+     "I am he whose mouth ever burneth;",
+     "I am the begetter and the bringer forth (?);",
+     "I am the Grace of the World;",
+     "my name is the heart girt with a serpent."
+    ],
+    "samekh1930": [
+     "I am He! the Bornless Spirit! having sight in the feet: Strong, and the Immortal Fire!",
+     "I am He! the Truth!",
+     "I am He! Who hate that evil should be wrought in the World!",
+     "I am He, that lighteneth and thundereth!",
+     "I am He, from whom is the Shower of the Life of Earth!",
+     "I am He, whose mouth ever flameth!",
+     "I am He, the Begetter and Manifester unto the Light!",
+     "I am He, The Grace of the Worlds!",
+     "\"The Heart Girt with a Serpent\" is my name!"
+    ]
+   },
+   "barbarousNames": [],
+   "barbarousNamesGoodwin": []
+  },
+  {
+   "id": "closing",
+   "title": "Such are the Words",
+   "element": null,
+   "quarter": null,
+   "lines": {
+    "goodwin1852": [
+     "Come forth and follow.",
+     "—The celebration of the preceding ceremony.—",
+     "Write the names upon a piece of new paper, and having extended it over your forehead from one temple to the other, address yourself turning towards the north to the six names, saying:—",
+     "Make all the spirits subject to me, so that every spirit of heaven and of the air, upon the earth and under the earth, on dry land and in the water, and every spell and scourge of God, may be obedient to me.—",
+     "And all the spirits shall be obedient to you. . . . . . . . ."
+    ],
+    "samekh1930": [
+     "Come thou forth, and follow me: and make all Spirits subject unto Me so that every Spirit of the Firmament, and of the Ether, upon the Earth and under the Earth: on dry Land, or in the Water: of Whirling Air or of rushing Fire, and every Spell and Scourge of God, may be obedient unto me!",
+     "IAF: SABAF",
+     "Such are the Words!"
+    ]
+   },
+   "barbarousNames": [
+    "IAF",
+    "SABAF"
+   ],
+   "barbarousNamesGoodwin": []
+  }
+ ],
+ "notes": "GOODWIN 1852. C. W. Goodwin (ed. & tr.), Fragment of a Græco-Egyptian Work upon Magic, from a Papyrus in the British Museum (Publications of the Cambridge Antiquarian Society, Octavo Series No. II; Cambridge: Deighton; Macmillan; 1852), section '4. An address to the god drawn upon the letter', English pp. 7 and 9 (Greek pp. 6 and 8). Transcribed from the Internet Archive OCR of the Google-digitised University of California copy (https://archive.org/stream/publications00verogoog/publications00verogoog_djvu.txt) and checked word by word against the page images of the same item's PDF (leaves 88-91). Goodwin left the Barbarous Names untranslated: in his English they stand as rows of dots, reproduced here as '. . . . . . . .'; the names appear only in his Greek text (listed in docs/SOURCES.md). Goodwin has no elemental headings, so his passages were aligned with Liber Samekh by the names that surround them in the Greek. He gives the 'Make all the spirits subject to me' formula once, at the end (Samekh repeats it after every section); it is placed in the closing stage. SAMEKH 1930. Aleister Crowley, Liber Samekh (Theurgia Goetia Summa, sub figura DCCC), Appendix IV of Magick in Theory and Practice (Paris: Lecram Press, title page dated 1929, issued 1929/30), Point I 'Evangelii Textus Redactus', pp. 265-273. Transcribed from the archive.org e-text (https://archive.org/details/MagickInTheoryAndPracticeAleisterCrowley) and corrected against page images of the 1929 first edition served by Wellcome Collection IIIF (https://iiif.wellcomecollection.org/presentation/v2/b29825064, canvases 0302-0309 = pp. 266-273). First-edition readings restored: 'whose Word is Truth' (e-texts: 'in Truth'); 'The Beast that whirlest forth' (e-text: 'Beas'). The printer's slip 'upon the Earth und under the Earth' (p. 273) is given as 'and'; the line-end hyphenation 'thunder-|bolt' as 'thunderbolt'; French-style spaces before '!' and spaced hyphens inside names (ANKH - F - N - KHONSU) are closed up; footnote markers and footnotes are omitted. The essential footnote (p. 267 n. 1) reads: 'The letter F is used to represent the Hebrew Vau and the Greek Digamma; its sound lies between those of the English long o and long oo, as in Rope and Tooth.' Each Barbarous Name is followed by an em-dash and Crowley's quoted paraphrase, which the 1929 edition sets in a second column; '(Vide Supra)' lines are his cross-references. STAGE MAPPING (1929 section labels): opening = Section A 'The Oath' + Section Aa; air = Section B 'Air'; fire = Section C 'Fire'; water = Section D 'Water'; earth = Section E 'Earth'; spirit = Section F 'Spirit' + Section Ff + Section G 'Spirit'; climax = Section Gg 'The Attainment'; closing = Section H 'The Charge to the Spirit' + Section J 'The Proclamation of the Beast 666'. Quarters follow Point II (Section B 'invokes Air in the East'; C 'Fire in the South'; D 'Water in the West'; E 'goes to the North to invoke Earth'; F 'facing toward Boleskine'). The labels 'Aa/Ee/Ii/Oo/Uu' sometimes used for the elemental sections do not occur in the 1929 edition, where 'Section Aa' is the second half of the Oath. BARBAROUS NAMES use the 1929 Samekh orthography (Th, Ph, Ch; F = Vau/digamma, so ThIAF = Thiao, ABRAFT = Abraoth, IAF = IAO). They were checked against Goodwin's Greek: air ar, thiao, reibet, atheleberseth, a, blatha, abeu, ebeu, phi, chitasoe, ib, thiao (Samekh fuses 'phi, chitasoe' into PhI-ThETA-SOE); fire arogogorobrao, sochou, modorio, phalarchao, ooo, ape; water roubriao, mariodam, balbnabaoth, assalonai, aphniao, i, tholeth, abrasax, aeoou, ischure; earth ma, barraio, ioel, kotha, athorebalo, abraoth; spirit aoth, abaoth, basum, isak, sabaoth, iao. The spirit stage keeps six beats: Goodwin's Greek has six names and his rubric says 'the six names' (p. 9); Samekh prints five entries (AFT, ABAFT, BAS-AUMGN, ISAK, SA-BA-FT) and carries the sixth, iao, only inside the gloss of SA-BA-FT ('Hail, I A O!'); it is supplied here as IAF, Crowley's spelling of the same word in Section J ('IAF : SABAF' = iao sabaoth). TRANSLITERATION. 'barbarousNamesGoodwin' gives a plain Latin transliteration of the names as printed in Goodwin's Greek (pp. 6/8): omega→o, eta→e, theta→th, phi→ph, chi→ch; e.g. Αωθ, αβαωθ, βασυμ, ισακ, σαβαωθ, ιαω → Aoth, Abaoth, Basum, Isak, Sabaoth, Iao. The six spirit beats of the rhythm stage use these six names (Goodwin's rubric: 'the six names'); the HUD shows the Samekh spellings when the Samekh edition is selected."
 }

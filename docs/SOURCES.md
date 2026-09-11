@@ -202,3 +202,11 @@ Downloaded sources (OCR text, page images, ALTO) were kept only in the session s
 not in the repository. The generator that produced `RitualText.json` from the verified
 transcription is a throw-away script; the JSON file is the deliverable and was validated
 with `python3 -c 'import json; json.load(open("BornlessRitual/Resources/RitualText.json"))'`.
+
+## 4a. Transliteration used by the app
+
+`barbarousNamesGoodwin` in `RitualText.json` is a plain Latin transliteration of Goodwin's
+Greek (ω→o, η→e, θ→th, φ→ph, χ→ch, υ→u). The six spirit beats in RitualCore
+(`RhythmSpec.names`) are Goodwin's six names in this transliteration: Aoth, Abaoth, Basum,
+Isak, Sabaoth, Iao. When the Samekh edition is selected the HUD shows `barbarousNames`
+(1929 orthography) instead.

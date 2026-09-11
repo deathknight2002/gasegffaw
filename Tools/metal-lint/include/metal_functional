@@ -1,0 +1,3 @@
+// metal-lint stub: <metal_functional> is a subset of <metal_stdlib>; the stub keeps
+// everything in one place.
+#include "metal_stdlib"

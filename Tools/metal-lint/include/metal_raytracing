@@ -1,0 +1,6 @@
+// metal-lint stub for <metal_raytracing>.
+#ifndef __MSL_METAL_RAYTRACING
+#define __MSL_METAL_RAYTRACING
+#include "metal_stdlib"
+#include "__msl/raytracing.h"
+#endif
