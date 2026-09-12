@@ -87,9 +87,10 @@ Sigil spin: rings i = 0..4 with radii 0.75, 0.62, 0.50, 0.39, 0.29 m, ember fila
 rune rings (the Hebrew name letters and the kamea path are inscribed on rings 0 and 2).
 Dynamics in `SigilDynamics` (see CORE_API): rigid rings with I_i = m_i r_i², coupled
 so adjacent rings counter-rotate (coupling torque k(ω_i + ω_{i+1})), viscous + Coulomb
-friction, flick impulse applied to the ring under the finger (or ring 0 if none).
+friction (ring 0 spins down with τ ≈ 5.6 s so momentum is visibly conserved), flick impulse
+applied to the ring under the finger (or ring 0 if none).
 Sparks shed tangentially with speed |ω| r + jitter; spark spawn rate ∝ |ω| r.
-Spin energy E = Σ ½ I ω². Manifest charge: dq/dt = E / E_ref, E_ref = 1.2 J·s;
+Spin energy E = Σ ½ I ω². Manifest charge: dq/dt = E / E_ref, E_ref = 20 J·s (about three good flicks);
 charge clamps to [0,1]; stage 8 begins at charge ≥ 1. Friction slider scales both
 friction coefficients; gravity slider scales g for embers.
 
@@ -126,6 +127,13 @@ The debug panel prints `NatalChart.appendixAReport()` verbatim.
   mix; `Hash.unit(...)` maps to [0,1). CPU sim uses only these. GPU shaders use the same
   hash (`hash_u32` in `Common.h`, bit-identical to Swift's `Hash.u32`) keyed by
   (seed, frameIndex or tick, pixel/particle id). A test in RitualCore pins hash outputs.
+  Only `seed_lo ^ seed_hi` enters the hash's first mixing round, so seeds with equal
+  XOR of their 32-bit words (1 and 1<<32, say) give identical hash streams: a seed
+  carries 32 bits of entropy into `Hash` (PCG32 uses all 64). Seeds are expected to be
+  < 2^32 (`-seed` defaults to 1); anything larger should differ in its low word.
+- `RitualState`/`Keyframe` JSON is value-determined: sets are written sorted and the
+  enum-keyed dictionaries as keyed objects (never hash-ordered flat arrays), so encoding
+  with `.sortedKeys` gives byte-identical bytes for equal states in every process.
 - Ember i spawned at tick s from ring state R(s): initial position/velocity from R(s)
   and `Hash(seed, s, i)`. Position at time t: linear drag k = 6.0 s⁻¹ (mm-scale glowing
   particle, Stokes regime approximation), g scaled by the gravity slider:

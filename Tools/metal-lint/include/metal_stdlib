@@ -1,0 +1,40 @@
+// metal-lint stub for <metal_stdlib>. NOT the real Metal Standard Library:
+// declarations only, just enough for clang++ -fsyntax-only on Linux.
+#ifndef __MSL_METAL_STDLIB
+#define __MSL_METAL_STDLIB
+
+#include "__msl/config.h"
+#include "__msl/types.h"
+#include "__msl/math.h"
+#include "__msl/matrix.h"
+#include "__msl/texture.h"
+#include "__msl/atomic.h"
+#include "__msl/simdgroup.h"
+
+// MSL exposes the builtin scalar/vector types both globally and as metal::T.
+namespace metal {
+using ::uchar; using ::ushort; using ::uint; using ::ulong; using ::half;
+using ::size_t; using ::ptrdiff_t;
+using ::int8_t; using ::uint8_t; using ::int16_t; using ::uint16_t;
+using ::int32_t; using ::uint32_t; using ::int64_t; using ::uint64_t;
+#define __MSL_EXPORT_VEC(T)                                                     \
+    using ::T##2; using ::T##3; using ::T##4;                                   \
+    using ::__msl_make_##T##2; using ::__msl_make_##T##3; using ::__msl_make_##T##4; \
+    using ::packed_##T##2; using ::packed_##T##3; using ::packed_##T##4;
+__MSL_EXPORT_VEC(char)
+__MSL_EXPORT_VEC(uchar)
+__MSL_EXPORT_VEC(short)
+__MSL_EXPORT_VEC(ushort)
+__MSL_EXPORT_VEC(int)
+__MSL_EXPORT_VEC(uint)
+__MSL_EXPORT_VEC(long)
+__MSL_EXPORT_VEC(ulong)
+__MSL_EXPORT_VEC(half)
+__MSL_EXPORT_VEC(float)
+#undef __MSL_EXPORT_VEC
+using ::bool2; using ::bool3; using ::bool4;
+using __msl::vec;
+template <class T, int N> using packed_vec = typename __msl::vec_of<T, N>::type;
+} // namespace metal
+
+#endif // __MSL_METAL_STDLIB
