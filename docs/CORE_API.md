@@ -45,7 +45,8 @@ public enum Ephemeris {
     // Sun: VSOP87D Earth (Meeus Appendix III tables: L0..L5, B0..B1, R0..R4 as printed), FK5 correction,
     // nutation in longitude, aberration −20.4898″/R. Result: apparent geocentric ecliptic-of-date.
     public static func sun(jdUT: Double) -> (longitude: Double, latitude: Double, distanceAU: Double)
-    // Moon: Meeus ch. 47 (ELP-2000/82 truncated, 60+60 terms) + nutation. Apparent geocentric.
+    // Moon: Meeus ch. 47 (ELP-2000/82 truncated, 60+60 terms) + nutation. Apparent geocentric. This IS the shipped engine:
+    // no code or tables derived from the Swiss Ephemeris sources (AGPL) may be used; accuracy ≈ 10″ is far inside the 0.1° tolerance.
     public static func moon(jdUT: Double) -> (longitude: Double, latitude: Double, distanceKm: Double)
     public static func nutation(jdTT: Double) -> (longitude: Double, obliquity: Double)   // IAU 1980, Meeus ch. 22 full 63-term table
     public static func meanObliquity(jdTT: Double) -> Double        // Laskar (Meeus 22.3)
@@ -188,9 +189,9 @@ public enum RitualEvent: Codable, Sendable, Equatable { case stageCompleted(Ritu
 public struct RingState: Codable, Sendable, Equatable { public var angle: Double /* rad */; public var omega: Double /* rad/s */; public let radius: Double; public let inertia: Double }
 public struct SigilDynamics: Codable, Sendable, Equatable {
     public var rings: [RingState]   // 5 rings, radii 0.75,0.62,0.50,0.39,0.29; masses 0.30,0.25,0.20,0.16,0.12 kg (I = m r²)
-    public var viscous: Double /* 0.35 N·m·s */; public var coulomb: Double /* 0.02 N·m */; public var coupling: Double /* 0.15 N·m·s */
+    public var viscous: Double /* 0.03 N·m·s (τ ≈ 5.6 s on ring 0) */; public var coulomb: Double /* 0.008 N·m */; public var coupling: Double /* 0.12 N·m·s */; public static let flickImpulsePerSpeed = 0.35 /* N·m·s per (unit of |v|) */
     public init(); public mutating func step(dt: Double, frictionScale: Double)  // semi-implicit Euler; Coulomb friction never reverses sign
-    public mutating func applyFlick(velocity: RVec2, ring: Int?)  // impulse J = clamp(|v|,0,4)·0.06 N·m·s on the ring, sign from the tangential direction; adjacent rings receive −0.5 J (counter-rotation)
+    public mutating func applyFlick(velocity: RVec2, ring: Int?)  // impulse J = clamp(|v|,0,4)·flickImpulsePerSpeed on the ring, sign from the tangential direction; adjacent rings receive −0.5 J (counter-rotation)
     public var kineticEnergy: Double
     public var sparkRate: Double     // Σ |ω_i| r_i × 40 sparks/s per (rad/s·m)
 }
@@ -252,7 +253,7 @@ public struct FrameLog: Codable, Sendable, Equatable {
 
 ## Tests required (`Tests/RitualCoreTests`)
 - `EphemerisTests`: every vector in `Fixtures/ephemeris_vectors.json` (41 vectors, Swiss Ephemeris/Moshier) within: Sun 0.01°, Moon 0.05°, ASC 0.05°, MC 0.05°, altitude 0.1°, obliquity 0.001°, nutation 0.001°; prenatal syzygy longitude 0.05° and instant within 2 minutes.
-- `AppendixATests`: owner chart pins every Appendix A number (0.05°), `appendixAReport()` matches the expected 9-line string exactly, name DRAND / דראנד with the five placements' letters, sigil cells, closed loop, attributes.
+- `AppendixATests`: owner chart pins every Appendix A number (0.05°); `appendixAReport()` is checked line by line: the 9-line layout, labels, sign names and the degree/minute strings must match Appendix A exactly, while the decimal longitudes in parentheses are parsed and compared with 0.01° tolerance (the Meeus Moon differs from Swiss/Moshier by a few arc-seconds); name DRAND / דראנד with the five placements' letters, sigil cells, closed loop, attributes.
 - `NameDerivationTests`: synthetic charts hitting wrap-around (offset 355.85 → Daleth), exact-degree boundaries, all 22 letters reachable; value reduction 200→20, 50→5, 400→4, 300→3; kamea validity (every 1..n² once, magic sums) for all seven squares.
 - `DeterminismTests`: same seed+inputs ⇒ identical state after 10,000 ticks; seek(toTick) after arbitrary stepping ⇒ identical to straight-through; Hash pins (e.g. Hash.u32(1,2,3,4) fixed value recorded in the test); PCG32 pins against the reference C implementation (seed 42, stream 54 → first outputs 0xa15c02b7, 0x7b47f409, 0xba1d3330, 0x83d2f293, 0xbfa4784b) — verify by implementing the reference exactly.
 - `RitualFlowTests`: autopilot completes all stages in order; stage order 1..8 asserted; candles ignite in East, South, West, North order; rhythm scoring windows; trace scorer passes a resampled template with noise 0.03 and fails a random scribble; camera-facing gate blocks the trace when not facing; SigilDynamics energy is non-increasing without flicks, counter-rotation of adjacent rings after a flick, Coulomb friction stops rings without sign reversal; manifest charge reaches 1 only with spin.

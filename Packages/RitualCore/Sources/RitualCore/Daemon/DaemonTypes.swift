@@ -172,7 +172,7 @@ public enum DaemonPalette: String, Codable, Sendable, CaseIterable {
     }
 }
 
-/// Element of the daemon (from the Sun sign's triplicity).
+/// Element of the daemon (triplicity of the sign holding the Lot of Spirit).
 public enum DaemonElement: String, Codable, Sendable, CaseIterable {
     case fire, earth, air, water
 
@@ -235,7 +235,7 @@ public enum DaemonMotion: String, Codable, Sendable, CaseIterable {
 
 /// Bearing of the daemon, from the chart ruler's dignity and whether it is rising.
 public enum DaemonPresence: String, Codable, Sendable, CaseIterable {
-    /// Ruler in domicile and rising.
+    /// Ruler in domicile, rising or not (the owner's Sun is both).
     case dominantUnhurried
     /// Ruler exalted.
     case exaltedRadiant
@@ -243,6 +243,6 @@ public enum DaemonPresence: String, Codable, Sendable, CaseIterable {
     case subdued
     /// Ruler in fall.
     case wary
-    /// Ruler peregrine (or in domicile but not rising).
+    /// Ruler peregrine.
     case restless
 }
