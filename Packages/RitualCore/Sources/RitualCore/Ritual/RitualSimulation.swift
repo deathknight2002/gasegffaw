@@ -7,7 +7,9 @@ import Foundation
 /// The configuration is not part of a `Keyframe`; a replay uses whatever configuration
 /// is current, so a run is reproducible as long as the configuration is held fixed.
 public struct SimConfig: Codable, Sendable, Equatable {
-    /// Multiplier on both sigil friction coefficients (slider 0–3, default 1).
+    /// Multiplier on both sigil friction coefficients (slider 0–3, default 1). Values
+    /// below 0 act as 0 and values above `SigilDynamics.maxFrictionScale` (10) as that
+    /// maximum, which keeps the ring integration stable and monotonically dissipative.
     public var frictionScale: Double
     /// Multiplier on gravity for embers (slider 0–3, default 1).
     public var gravityScale: Double
@@ -96,7 +98,9 @@ public final class RitualSimulation {
     public private(set) var keyframes: [Keyframe]
     /// Highest tick reached with the current input log.
     public private(set) var maxSimulatedTick: Int
-    /// Events raised by the most recent `step()`, in order (empty after a seek).
+    /// Events raised by the most recent `step()`, in order. Empty after any `seek`, even
+    /// one that lands on (or replays through) a tick that raised events, so a haptics or
+    /// narration layer keyed on this never re-fires on a scrub landing.
     public private(set) var lastStepEvents: [RitualEvent]
 
     /// Generator state; snapshotted in keyframes so stochastic effects rewind exactly.
@@ -154,8 +158,14 @@ public final class RitualSimulation {
     /// re-stamped to the current tick (it cannot change the past). Keyframes after the
     /// input's tick are discarded because the run beyond it has changed.
     ///
+    /// An input carrying a non-finite value (NaN or ±∞ yaw, trace point or flick
+    /// velocity — see ``InputKind/isFinite``) is rejected outright: it is neither logged
+    /// nor applied, so the state, the keyframes and the input log always stay finite and
+    /// JSON-encodable.
+    ///
     /// - Parameter input: The input to log.
     public func apply(_ input: RitualInput) {
+        guard input.kind.isFinite else { return }
         let stamped = input.tick >= tick ? input : RitualInput(tick: tick, kind: input.kind)
         inputLog.append(stamped)
         let position = Self.upperBound(of: stamped.tick, in: orderedInputs)
@@ -200,11 +210,13 @@ public final class RitualSimulation {
     /// Restores the nearest keyframe at or before `target` and replays the input log up
     /// to it; when the current position already lies between that keyframe and the target
     /// the simulation simply steps forward. Targets beyond `maxSimulatedTick` are simulated.
+    /// `lastStepEvents` is empty afterwards on both paths.
     ///
     /// - Parameter target: Destination tick.
     public func seek(toTick target: Int) {
         let destination = max(0, target)
         guard let keyframe = keyframes.last(where: { $0.tick <= destination }) else { return }
+        defer { lastStepEvents = [] }
         if tick <= destination, tick >= keyframe.tick {
             step(ticks: destination - tick)
             return

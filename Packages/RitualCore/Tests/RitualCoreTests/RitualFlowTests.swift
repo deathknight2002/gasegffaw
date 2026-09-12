@@ -95,8 +95,14 @@ final class RitualFlowTests: XCTestCase {
         let spinStart = simulation.state.completedTick[.spirit]!
         let spinDone = simulation.state.completedTick[.sigilSpin]!
         XCTAssertLessThanOrEqual(spinDone - spinStart, 15 * tickRate, "three flicks charge the manifestation within ~15 s")
-        let thirdFlick = script.last { if case .flick = $0.kind { return true } else { return false } }!.tick
+        let flickTicks = script.compactMap { input -> Int? in
+            if case .flick = input.kind { return input.tick } else { return nil }
+        }
+        XCTAssertEqual(flickTicks.map { $0 - spinStart }, [60, 180, 360], "no retry was needed: exactly the three scheduled flicks")
+        let thirdFlick = flickTicks.last!
         XCTAssertGreaterThan(spinDone, thirdFlick, "all three flicks contribute before the charge is full")
+        XCTAssertGreaterThan(spinDone, thirdFlick + tickRate, "the spin showcase (1 s after the third flick) is still in stage 7")
+        XCTAssertLessThanOrEqual(spinDone - thirdFlick, 4 * tickRate, "the charge fills within a few seconds of the third flick")
         XCTAssertEqual(simulation.state.completedTick[.manifestation]! - spinDone, 8 * tickRate, "manifestT reaches 1 after 8 s")
         // Progress is 1 once the finale has played.
         XCTAssertEqual(simulation.state.stageProgress, 1)
@@ -130,8 +136,9 @@ final class RitualFlowTests: XCTestCase {
         XCTAssertEqual(flicks.count, 3)
         let spinStart = flicks[0].tick - 60
         XCTAssertEqual(flicks.map { $0.tick - spinStart }, [60, 180, 360])
+        // Alternating directions so every flick reinforces the rings' counter-rotation.
         XCTAssertEqual(flicks.map(\.kind), [
-            .flick(velocity: RVec2(3.5, 0), ring: 0), .flick(velocity: RVec2(3.5, 0), ring: 1), .flick(velocity: RVec2(3.5, 0), ring: 0),
+            .flick(velocity: RVec2(2.2, 0), ring: 0), .flick(velocity: RVec2(-2.2, 0), ring: 1), .flick(velocity: RVec2(2.2, 0), ring: 0),
         ])
         XCTAssertEqual(Autopilot.inputs(through: .manifestation, seed: 9), Autopilot.inputs(through: .sigilSpin, seed: 9),
                        "the manifestation has no actions of its own")
@@ -179,8 +186,12 @@ final class RitualFlowTests: XCTestCase {
         }
         spin.seek(toTick: Autopilot.showcaseTick(for: .sigilSpin, seed: seed))
         XCTAssertTrue(spin.state.sigilErupted)
-        XCTAssertGreaterThan(spin.state.spinEnergy, 0)
-        XCTAssertGreaterThan(spin.state.sigil.sparkRate, 0)
+        XCTAssertEqual(spin.state.stage, .sigilSpin, "the manifestation has not begun yet")
+        XCTAssertLessThan(spin.state.manifestCharge, 1)
+        XCTAssertGreaterThan(spin.state.manifestCharge, 0.5, "well on the way to the manifestation")
+        XCTAssertGreaterThan(spin.state.spinEnergy, 4, "rings at peak spin (≈ 5 J)")
+        XCTAssertGreaterThan(spin.state.sigil.rings[0].omega, 6, "outer ring above one revolution per second")
+        XCTAssertGreaterThan(spin.state.sigil.sparkRate, 400, "sparks shedding")
     }
 
     // MARK: - Oath
@@ -344,7 +355,7 @@ final class RitualFlowTests: XCTestCase {
         XCTAssertTrue(simulation.state.sigilErupted)
     }
 
-    func testRhythmProgressAndLateTapCountsAgainstNextBeat() {
+    func testRhythmProgressAndStrayTapAfterTheWindowIsIgnored() {
         let simulation = spiritSimulation()
         let beat0 = simulation.state.beatTick(0)
         simulation.seek(toTick: beat0 + 36)
@@ -354,11 +365,59 @@ final class RitualFlowTests: XCTestCase {
         XCTAssertEqual(simulation.state.beatResults, [.miss])
         XCTAssertEqual(simulation.lastStepEvents, [.beatHit(.miss)])
         XCTAssertEqual(simulation.state.stageProgress, 1.0 / 6.0, accuracy: 1e-12)
-        // A tap now is judged against beat 1 (the nearest unjudged one) and is far too early.
+        // A tap now (+0.31 s after beat 0, 0.49 s before beat 1) is inside no beat's good
+        // window: it is ignored and beat 1 stays open instead of being consumed as a miss.
         simulation.apply(RitualInput(tick: simulation.tick, kind: .tap))
         simulation.step()
-        XCTAssertEqual(simulation.state.beatResults, [.miss, .miss])
-        XCTAssertEqual(simulation.state.beatIndex, 2)
+        XCTAssertEqual(simulation.state.beatResults, [.miss])
+        XCTAssertEqual(simulation.state.beatIndex, 1)
+        XCTAssertTrue(simulation.lastStepEvents.isEmpty)
+        // Beat 1 can still be hit on time.
+        simulation.apply(RitualInput(tick: simulation.state.beatTick(1), kind: .tap))
+        var events: [RitualEvent] = []
+        XCTAssertTrue(run(simulation, limitTicks: 200, events: &events) { $0.beatIndex == 2 })
+        XCTAssertEqual(simulation.state.beatResults, [.miss, .perfect])
+    }
+
+    /// ARCHITECTURE §3: "≥ 5 good of 6 → success". A player who hits five beats exactly
+    /// and taps 0.31 s late (or 0.35 s early) on the first must pass the round exactly like
+    /// one who never taps that beat: the stray tap belongs to no beat, so it must not
+    /// consume beat 0 (or beat 1) and cascade every later on-beat tap into a miss.
+    func testStrayTapDoesNotCascadeLaterOnBeatTapsIntoMisses() {
+        for strayOffset in [37, -42] {  // +0.31 s late, −0.35 s early
+            let simulation = spiritSimulation()
+            let lastBeat = simulation.state.beatTick(RhythmSpec.beatsPerRound - 1)
+            simulation.apply(RitualInput(tick: simulation.state.beatTick(0) + strayOffset, kind: .tap))
+            for index in 1..<RhythmSpec.beatsPerRound {
+                simulation.apply(RitualInput(tick: simulation.state.beatTick(index), kind: .tap))
+            }
+            var events: [RitualEvent] = []
+            XCTAssertTrue(run(simulation, limitTicks: 800, events: &events) { $0.stage == .sigilSpin },
+                          "stray offset \(strayOffset): the Spirit stage must still complete")
+            let beats = events.compactMap { event -> BeatResult? in
+                if case .beatHit(let result) = event { return result } else { return nil }
+            }
+            XCTAssertEqual(beats, [.miss, .perfect, .perfect, .perfect, .perfect, .perfect], "stray offset \(strayOffset)")
+            XCTAssertEqual(simulation.state.rhythmRound, 0, "stray offset \(strayOffset)")
+            XCTAssertTrue(simulation.state.sigilErupted)
+            XCTAssertEqual(simulation.state.sigilEruptTick, lastBeat, "the round resolves on the sixth beat's tap")
+        }
+    }
+
+    func testEarlyStrayTapLeavesTheBeatOpenForATimelyTap() {
+        let simulation = spiritSimulation()
+        let beat0 = simulation.state.beatTick(0)
+        simulation.apply(RitualInput(tick: beat0 - 42, kind: .tap))  // −0.35 s: outside the window
+        simulation.apply(RitualInput(tick: beat0, kind: .tap))
+        var events: [RitualEvent] = []
+        XCTAssertTrue(run(simulation, limitTicks: 200, events: &events) { $0.beatIndex == 1 })
+        XCTAssertEqual(simulation.state.beatResults, [.perfect])
+        XCTAssertEqual(events, [.beatHit(.perfect)])
+        // A second tap inside the same window, after the beat was judged, is ignored too.
+        simulation.apply(RitualInput(tick: simulation.tick, kind: .tap))
+        simulation.step()
+        XCTAssertEqual(simulation.state.beatResults, [.perfect])
+        XCTAssertTrue(simulation.lastStepEvents.isEmpty)
     }
 
     func testFailedRoundRepeatsAfterRetryDelay() {
@@ -411,8 +470,9 @@ final class RitualFlowTests: XCTestCase {
         XCTAssertEqual(simulation.state.stageProgress, simulation.state.manifestCharge)
         let charge = simulation.state.manifestCharge
         simulation.step()
-        XCTAssertEqual(simulation.state.manifestCharge - charge, simulation.state.spinEnergy / 1.2 / 120, accuracy: 1e-12,
-                       "dq/dt = E / 1.2")
+        XCTAssertEqual(RitualRules.manifestChargeReference, 20, "E_ref = 20 J·s")
+        XCTAssertEqual(simulation.state.manifestCharge - charge, simulation.state.spinEnergy / 20 / 120, accuracy: 1e-12,
+                       "dq/dt = E / 20")
         XCTAssertLessThan(simulation.state.manifestCharge, 1)
         XCTAssertGreaterThan(simulation.state.sigil.rings[0].omega, 0)
         XCTAssertLessThan(simulation.state.sigil.rings[1].omega, 0)

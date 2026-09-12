@@ -10,7 +10,9 @@
 //  current slot: one indexed draw per instance with `baseInstance` = instance index
 //  (so `[[instance_id]]` addresses `InstanceData[]` directly), the vertex buffer offset
 //  at the instance's geometry slot, and the cull mode of the owning `MeshRegion`
-//  (the room is registered with `.none`, everything else `.back`). Instances whose
+//  (SceneBuilder registers the inward-facing chamber box with `.back` so cameras
+//  outside the room see through the near wall, and the sorcerer's cloth with `.none`
+//  because the hood interior is visible; everything else is `.back`). Instances whose
 //  material carries MATERIAL_FLAG_NO_SHADOW (flame proxies, drawn by FlamePass) are
 //  skipped so they never write depth in front of the flame quads.
 //

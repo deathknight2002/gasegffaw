@@ -93,6 +93,12 @@ public enum Hash {
     /// `[seed_hi, a, b, c]`: `h ^= v; h = (h ^ (h >> 16)) * 0x7FEB352D;
     /// h = (h ^ (h >> 15)) * 0x846CA68B; h ^= h >> 16` (all wrapping 32-bit arithmetic).
     ///
+    /// Seed entropy: the first avalanche only sees `seed_lo ^ seed_hi ^ salt`, so every
+    /// seed with the same `seed_lo ^ seed_hi` yields the same stream for every `(a, b, c)`
+    /// — e.g. `1` and `1 << 32`, or `0x0000_0001_0000_0001` and `0`. A seed therefore
+    /// carries 32 bits of entropy into this hash (the PCG generator uses all 64). Choose
+    /// seeds below 2³², or with distinct low words, when distinct streams matter.
+    ///
     /// - Parameters:
     ///   - seed: Simulation/render seed; split into low and high 32-bit words.
     ///   - a: First key (typically a tick or frame index).

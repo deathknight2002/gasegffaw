@@ -5,9 +5,8 @@ import Foundation
 /// The implementation follows Meeus, *Astronomical Algorithms* (2nd ed.):
 /// - Sun: VSOP87D Earth (Appendix III truncation), FK5 correction, nutation, aberration
 ///   (`SolarPosition.swift`).
-/// - Moon: Moshier's ELP2000-85/DE404 lunar series (the theory behind the reference
-///   vectors) with light-time and nutation; the chapter 47 series (ELP-2000/82 truncated to
-///   60 + 60 terms) is kept as `moonMeeus` (`LunarPosition.swift`).
+/// - Moon: the chapter 47 series (ELP-2000/82 truncated to the 60 + 60 terms of Tables
+///   47.A/47.B) plus nutation in longitude (`LunarPosition.swift`).
 /// - Nutation: the full 63-term IAU 1980 series, Table 22.A; mean obliquity: Laskar 22.3
 ///   (this file).
 /// - Sidereal time (chapter 12) and the horizon/ecliptic angles (`SiderealTime.swift`,

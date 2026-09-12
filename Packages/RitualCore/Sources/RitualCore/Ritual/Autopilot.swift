@@ -9,9 +9,18 @@ import Foundation
 /// Per stage the autopilot: holds the chant for 3.2 s; turns the camera to each quarter
 /// at +0.2 s and then traces the template (180 samples, one per tick over 1.5 s, jittered
 /// by ±0.01 from `Hash`) before lifting; taps 0.02 s after every beat; and flicks the
-/// sigil three times (`(3.5, 0)` on ring 0 at +0.5 s, ring 1 at +1.5 s, ring 0 at +3.0 s).
-/// With the contract friction and coupling coefficients those three flicks must charge
-/// the manifestation within about 15 s, which fixes `SigilDynamics.flickImpulsePerSpeed`.
+/// sigil three times at +0.5, +1.5 and +3.0 s — rightward on ring 0, leftward on ring 1,
+/// rightward on ring 0 again (`flickSchedule`, speed `flickSpeed`).
+///
+/// The flicks alternate direction so that each one *adds* to the counter-rotating mode the
+/// coupling drives the rings into (a rightward flick on ring 1 would fight the spin the
+/// first flick already gave it and waste most of the energy). With the contract dynamics
+/// (`viscous` 0.03, `coulomb` 0.008, `coupling` 0.12, `flickImpulsePerSpeed` 0.35,
+/// `E_ref` 20 J·s) three such flicks at speed 2.2 bring the manifest charge to ≈ 0.83 at
+/// the spin showcase (1.0 s after the third flick, rings at peak spin) and to 1 about
+/// 4.9 s into the stage, with ≈ 20 % of ∫E dt to spare — comfortably inside the 15 s the
+/// tests demand. Full-speed alternating flicks (3.5) would fill the charge before the
+/// third flick lands; same-direction flicks never fill it.
 public enum Autopilot {
     /// Seconds the oath control is held.
     public static let holdSeconds = 3.2
@@ -23,10 +32,20 @@ public enum Autopilot {
     public static let traceJitter = 0.01
     /// Offset of every tap after its beat.
     public static let tapLateSeconds = 0.02
-    /// Flick velocity in normalised sigil-plane units per second.
-    public static let flickVelocity = RVec2(3.5, 0)
-    /// Stage-relative flick times in seconds with the ring under the finger.
-    public static let flickSchedule: [(seconds: Double, ring: Int)] = [(0.5, 0), (1.5, 1), (3.0, 0)]
+    /// Flick speed in normalised sigil-plane units per second (see the type comment for
+    /// why 2.2 rather than a full-speed swipe).
+    public static let flickSpeed = 2.2
+    /// Stage-relative flick schedule: seconds after the stage begins, the ring under the
+    /// finger and the tangential direction (`+1` rightward, `−1` leftward), alternating so
+    /// the flicks reinforce the rings' counter-rotation.
+    public static let flickSchedule: [(seconds: Double, ring: Int, direction: Double)] = [(0.5, 0, 1), (1.5, 1, -1), (3.0, 0, 1)]
+
+    /// Gesture velocity of one scheduled flick: `flickSpeed` along ±x.
+    ///
+    /// - Parameter direction: `+1` for a rightward flick, `−1` for a leftward one.
+    public static func flickVelocity(direction: Double) -> RVec2 {
+        RVec2(flickSpeed * (direction < 0 ? -1 : 1), 0)
+    }
     /// Upper bound on the ticks the generator will wait for one stage to complete.
     public static let maxTicksPerStage = 120 * 120
 
@@ -203,7 +222,7 @@ public enum Autopilot {
             }
         case .sigilSpin:
             return flickSchedule.map { entry in
-                RitualInput(tick: at(entry.seconds), kind: .flick(velocity: flickVelocity, ring: entry.ring))
+                RitualInput(tick: at(entry.seconds), kind: .flick(velocity: flickVelocity(direction: entry.direction), ring: entry.ring))
             }
         case .manifestation:
             return []

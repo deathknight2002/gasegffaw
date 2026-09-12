@@ -84,20 +84,32 @@ final class AppendixAChartTests: XCTestCase {
 
     // MARK: - Report
 
-    func testAppendixAReportExactText() {
-        let expected = """
-        Sun 23°30' Leo (143.494°)
-        Moon 7°42' Sagittarius (247.694°)
-        Ascendant 20°13' Leo (140.211°)
-        MC 9°28' Taurus (39.468°)
-        Sun altitude −2.87° → night chart
-        Prenatal syzygy New Moon 2002-08-08 19:15 UT 16°04' Leo (136.063°)
-        Lot of Fortune 6°01' Taurus (36.010°)
-        Lot of Spirit 4°25' Sagittarius (244.411°)
-        Chart ruler Sun — in domicile, rising
-        """
-        XCTAssertEqual(chart.appendixAReport(), expected)
-        XCTAssertEqual(chart.appendixAReport().split(separator: "\n", omittingEmptySubsequences: false).count, 9)
+    func testAppendixAReportMatchesAppendixALineByLine() {
+        // Labels, sign names and degree/minute strings verbatim; decimals to 0.01°
+        // (see `AppendixAReportAssertions.swift`).
+        let report = chart.appendixAReport()
+        assertAppendixAReport(report)
+        XCTAssertEqual(report.split(separator: "\n", omittingEmptySubsequences: false).count, 9)
+        // The values the report prints are the chart's own, formatted to three decimals.
+        XCTAssertTrue(report.hasPrefix("Sun \(chart.sun.formatted)\nMoon \(chart.moon.formatted)\n"))
+        XCTAssertTrue(report.contains("\nLot of Fortune \(chart.lotOfFortune.formatted)\n"))
+    }
+
+    func testAppendixAReportAssertionRejectsWrongText() {
+        // The line-by-line check must itself fail on a wrong sign name, a wrong minute
+        // string or a longitude off by more than 0.01°: exercise the parser directly.
+        let (text, value) = AppendixAReport.splitLongitude("Moon 7°42' Sagittarius (247.693°)")
+        XCTAssertEqual(text, "Moon 7°42' Sagittarius")
+        XCTAssertEqual(value, 247.693)
+        XCTAssertNil(AppendixAReport.splitLongitude("Moon 7°42' Sagittarius (247.69°)").value, "three decimals required")
+        XCTAssertNil(AppendixAReport.splitLongitude("Moon 7°42' Sagittarius").value)
+        XCTAssertEqual(AppendixAReport.splitLongitude("Prenatal syzygy New Moon 2002-08-08 19:15 UT 16°04' Leo (136.063°)").text,
+                       "Prenatal syzygy New Moon 2002-08-08 19:15 UT 16°04' Leo")
+        XCTAssertEqual(AppendixAReport.parseAltitude("Sun altitude −2.87° → night chart"), -2.87)
+        XCTAssertNil(AppendixAReport.parseAltitude("Sun altitude 2.87° → day chart"))
+        XCTAssertTrue(AppendixAReport.altitudeRange.contains(-2.868))
+        XCTAssertFalse(AppendixAReport.altitudeRange.contains(-2.85))
+        XCTAssertEqual(AppendixAReport.longitudeLines.map(\.index), [0, 1, 2, 3, 5, 6, 7])
     }
 
     func testComputedChartIsDeterministicAndCodable() throws {

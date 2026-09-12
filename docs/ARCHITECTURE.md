@@ -127,6 +127,13 @@ The debug panel prints `NatalChart.appendixAReport()` verbatim.
   mix; `Hash.unit(...)` maps to [0,1). CPU sim uses only these. GPU shaders use the same
   hash (`hash_u32` in `Common.h`, bit-identical to Swift's `Hash.u32`) keyed by
   (seed, frameIndex or tick, pixel/particle id). A test in RitualCore pins hash outputs.
+  Only `seed_lo ^ seed_hi` enters the hash's first mixing round, so seeds with equal
+  XOR of their 32-bit words (1 and 1<<32, say) give identical hash streams: a seed
+  carries 32 bits of entropy into `Hash` (PCG32 uses all 64). Seeds are expected to be
+  < 2^32 (`-seed` defaults to 1); anything larger should differ in its low word.
+- `RitualState`/`Keyframe` JSON is value-determined: sets are written sorted and the
+  enum-keyed dictionaries as keyed objects (never hash-ordered flat arrays), so encoding
+  with `.sortedKeys` gives byte-identical bytes for equal states in every process.
 - Ember i spawned at tick s from ring state R(s): initial position/velocity from R(s)
   and `Hash(seed, s, i)`. Position at time t: linear drag k = 6.0 s⁻¹ (mm-scale glowing
   particle, Stokes regime approximation), g scaled by the gravity slider:

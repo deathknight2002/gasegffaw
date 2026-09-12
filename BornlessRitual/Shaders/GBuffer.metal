@@ -222,7 +222,8 @@ fragment GBufferOut gbuffer_fragment(GBufferVaryings in [[stage_in]],
                                      texture2d<float> chalkMask [[texture(TextureIndexChalkMask)]]) {
     device const MaterialData &material = materials[in.materialIndex];
 
-    // Two-sided geometric normal (the room is drawn without culling).
+    // Two-sided geometric normal (meshes registered with cull mode .none, e.g. the
+    // sorcerer's cloth whose hood interior is visible, rasterise their back faces).
     float3 geometricNormal = safe_normalize(in.worldNormal);
     if (!frontFacing) {
         geometricNormal = -geometricNormal;

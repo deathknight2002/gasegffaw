@@ -12,8 +12,9 @@ public enum RitualRules {
     public static let traceCheckpointCount = SigilTemplates.defaultCheckpointCount
     /// Checkpoints that must be hit, in order, for a trace to light the candle.
     public static let traceRequiredHits = 18
-    /// `E_ref` in J·s: `d(charge)/dt = spinEnergy / manifestChargeReference`.
-    public static let manifestChargeReference = 1.2
+    /// `E_ref` in J·s: `d(charge)/dt = spinEnergy / manifestChargeReference` (ARCHITECTURE §3:
+    /// 20 J·s, about three good flicks).
+    public static let manifestChargeReference = 20.0
     /// Seconds over which `manifestT` rises 0 → 1 (smoothstep).
     public static let manifestationDuration = 8.0
 
@@ -136,7 +137,13 @@ public struct RitualState: Codable, Sendable, Equatable {
 
 extension RitualState {
     /// Applies one input at `tick`. Returns the events it raised, in order.
+    ///
+    /// Inputs carrying a non-finite value (see ``InputKind/isFinite``) leave the state
+    /// untouched: `RitualSimulation.apply` already refuses to log them, and the guard here
+    /// keeps the documented invariants (`cameraYaw` in [0, 360), finite trace samples and
+    /// ring velocities) even for inputs that reach the state by another route.
     mutating func consume(_ kind: InputKind, tick: Int) -> [RitualEvent] {
+        guard kind.isFinite else { return [] }
         switch kind {
         case .holdBegin:
             holding = true
@@ -243,28 +250,19 @@ extension RitualState {
 
     // MARK: Rhythm
 
+    /// Judges a tap against the open beat, or ignores it.
+    ///
+    /// The open beat is always `beatIndex`: a beat is auto-missed at `+goodWindow` by
+    /// `integrateRhythm`, and with beats 0.8 s apart and a ±0.30 s good window the next
+    /// beat's window opens 0.2 s later still, so the windows never overlap. A tap outside
+    /// the open beat's good window therefore belongs to no beat and must not consume one:
+    /// it is ignored, the beat stays open for a timely tap (or the timeout miss), and a
+    /// stray early or late tap cannot cascade every later on-beat tap into a miss.
     private mutating func judgeTap(tick: Int) -> [RitualEvent] {
         guard beatIndex < RhythmSpec.beatsPerRound else { return [] }
-        // The nearest unjudged beat. Earlier beats are auto-missed at +goodWindow before the
-        // next beat comes within reach, so in practice this is always `beatIndex`; skipped
-        // beats (if any) are recorded as misses to keep the results in order.
-        var nearest = beatIndex
-        var nearestDistance = abs(beatTick(beatIndex) - tick)
-        for index in (beatIndex + 1)..<RhythmSpec.beatsPerRound {
-            let distance = abs(beatTick(index) - tick)
-            if distance < nearestDistance {
-                nearest = index
-                nearestDistance = distance
-            }
-        }
-        var events: [RitualEvent] = []
-        while beatIndex < nearest && stage == .spirit {
-            events += recordBeat(.miss, tick: tick)
-        }
-        guard stage == .spirit, beatIndex < RhythmSpec.beatsPerRound else { return events }
-        let result = RhythmSpec.judge(offsetTicks: tick - beatTick(beatIndex))
-        events += recordBeat(result, tick: tick)
-        return events
+        let offsetTicks = tick - beatTick(beatIndex)
+        guard abs(offsetTicks) <= RhythmSpec.goodTicks else { return [] }
+        return recordBeat(RhythmSpec.judge(offsetTicks: offsetTicks), tick: tick)
     }
 
     private mutating func integrateRhythm(tick: Int) -> [RitualEvent] {
@@ -352,5 +350,131 @@ extension RitualState {
         case .manifestation:
             stageProgress = min(max(manifestT, 0), 1)
         }
+    }
+}
+
+// MARK: - Codable (deterministic layout)
+
+extension RitualState {
+    private enum CodingKeys: String, CodingKey {
+        case stage, stageStartTick, stageProgress, completedStages
+        case holding, chantProgress, ringKindle
+        case cameraYaw, facingQuarter, trace, traceHits, traceAttempts
+        case candles
+        case beatIndex, beatResults, rhythmRound
+        case sigilErupted, sigilEruptTick
+        case sigil
+        case spinEnergy, manifestCharge
+        case manifestStartTick, manifestT
+        case completedTick, lastEvent
+    }
+
+    /// Key of one entry in the `candles` (`Quarter.rawValue`) and `completedTick`
+    /// (`RitualStage.id`) objects.
+    private struct EntryKey: CodingKey {
+        let stringValue: String
+        var intValue: Int? { nil }
+
+        init(stringValue: String) {
+            self.stringValue = stringValue
+        }
+
+        init?(intValue: Int) {
+            nil
+        }
+    }
+
+    /// Decodes the layout written by ``encode(to:)``.
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        stage = try container.decode(RitualStage.self, forKey: .stage)
+        stageStartTick = try container.decode(Int.self, forKey: .stageStartTick)
+        stageProgress = try container.decode(Double.self, forKey: .stageProgress)
+        completedStages = Set(try container.decode([RitualStage].self, forKey: .completedStages))
+        holding = try container.decode(Bool.self, forKey: .holding)
+        chantProgress = try container.decode(Double.self, forKey: .chantProgress)
+        ringKindle = try container.decode(Double.self, forKey: .ringKindle)
+        cameraYaw = try container.decode(Double.self, forKey: .cameraYaw)
+        facingQuarter = try container.decode(Bool.self, forKey: .facingQuarter)
+        trace = try container.decode([RVec2].self, forKey: .trace)
+        traceHits = try container.decode(Int.self, forKey: .traceHits)
+        traceAttempts = try container.decode(Int.self, forKey: .traceAttempts)
+        let candleContainer = try container.nestedContainer(keyedBy: EntryKey.self, forKey: .candles)
+        var decodedCandles: [Quarter: CandleState] = [:]
+        for quarter in Quarter.allCases {
+            let key = EntryKey(stringValue: quarter.rawValue)
+            if let candle = try candleContainer.decodeIfPresent(CandleState.self, forKey: key) {
+                decodedCandles[quarter] = candle
+            }
+        }
+        candles = decodedCandles
+        beatIndex = try container.decode(Int.self, forKey: .beatIndex)
+        beatResults = try container.decode([BeatResult].self, forKey: .beatResults)
+        rhythmRound = try container.decode(Int.self, forKey: .rhythmRound)
+        sigilErupted = try container.decode(Bool.self, forKey: .sigilErupted)
+        sigilEruptTick = try container.decodeIfPresent(Int.self, forKey: .sigilEruptTick)
+        sigil = try container.decode(SigilDynamics.self, forKey: .sigil)
+        spinEnergy = try container.decode(Double.self, forKey: .spinEnergy)
+        manifestCharge = try container.decode(Double.self, forKey: .manifestCharge)
+        manifestStartTick = try container.decodeIfPresent(Int.self, forKey: .manifestStartTick)
+        manifestT = try container.decode(Double.self, forKey: .manifestT)
+        let tickContainer = try container.nestedContainer(keyedBy: EntryKey.self, forKey: .completedTick)
+        var decodedTicks: [RitualStage: Int] = [:]
+        for completed in RitualStage.allCases {
+            let key = EntryKey(stringValue: completed.id)
+            if let tick = try tickContainer.decodeIfPresent(Int.self, forKey: key) {
+                decodedTicks[completed] = tick
+            }
+        }
+        completedTick = decodedTicks
+        lastEvent = try container.decodeIfPresent(RitualEvent.self, forKey: .lastEvent)
+    }
+
+    /// Encodes the state in a layout whose bytes depend only on the value (ARCHITECTURE §6).
+    ///
+    /// The synthesized conformance emits `completedStages` in `Set` iteration order and
+    /// the enum-keyed dictionaries as flat `[key, value, …]` arrays in `Dictionary` order,
+    /// both of which are seeded per process and which no encoder option can sort. Here
+    /// `completedStages` is written sorted by stage number, `candles` as an object keyed
+    /// by `Quarter.rawValue` and `completedTick` as an object keyed by `RitualStage.id`,
+    /// so with `JSONEncoder.OutputFormatting.sortedKeys` (which orders every keyed
+    /// object) two encodings of equal states are byte-identical in every process.
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(stage, forKey: .stage)
+        try container.encode(stageStartTick, forKey: .stageStartTick)
+        try container.encode(stageProgress, forKey: .stageProgress)
+        try container.encode(completedStages.sorted { $0.rawValue < $1.rawValue }, forKey: .completedStages)
+        try container.encode(holding, forKey: .holding)
+        try container.encode(chantProgress, forKey: .chantProgress)
+        try container.encode(ringKindle, forKey: .ringKindle)
+        try container.encode(cameraYaw, forKey: .cameraYaw)
+        try container.encode(facingQuarter, forKey: .facingQuarter)
+        try container.encode(trace, forKey: .trace)
+        try container.encode(traceHits, forKey: .traceHits)
+        try container.encode(traceAttempts, forKey: .traceAttempts)
+        var candleContainer = container.nestedContainer(keyedBy: EntryKey.self, forKey: .candles)
+        for quarter in Quarter.allCases {
+            if let candle = candles[quarter] {
+                try candleContainer.encode(candle, forKey: EntryKey(stringValue: quarter.rawValue))
+            }
+        }
+        try container.encode(beatIndex, forKey: .beatIndex)
+        try container.encode(beatResults, forKey: .beatResults)
+        try container.encode(rhythmRound, forKey: .rhythmRound)
+        try container.encode(sigilErupted, forKey: .sigilErupted)
+        try container.encodeIfPresent(sigilEruptTick, forKey: .sigilEruptTick)
+        try container.encode(sigil, forKey: .sigil)
+        try container.encode(spinEnergy, forKey: .spinEnergy)
+        try container.encode(manifestCharge, forKey: .manifestCharge)
+        try container.encodeIfPresent(manifestStartTick, forKey: .manifestStartTick)
+        try container.encode(manifestT, forKey: .manifestT)
+        var tickContainer = container.nestedContainer(keyedBy: EntryKey.self, forKey: .completedTick)
+        for completed in RitualStage.allCases {
+            if let tick = completedTick[completed] {
+                try tickContainer.encode(tick, forKey: EntryKey(stringValue: completed.id))
+            }
+        }
+        try container.encodeIfPresent(lastEvent, forKey: .lastEvent)
     }
 }

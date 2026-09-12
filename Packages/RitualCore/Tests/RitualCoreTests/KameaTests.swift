@@ -141,4 +141,44 @@ final class KameaTests: XCTestCase {
             XCTAssertEqual(decoded, original)
         }
     }
+
+    /// Decoding validates the n×n / permutation invariant so a malformed grid can never
+    /// index out of bounds in `value(row:col:)`.
+    func testMalformedGridsFailToDecode() throws {
+        let valid = #"{"planet":"saturn","order":3,"cells":[[4,9,2],[3,5,7],[8,1,6]]}"#
+        XCTAssertEqual(try JSONDecoder().decode(Kamea.self, from: Data(valid.utf8)), Kamea.saturn)
+        let malformed = [
+            #"{"planet":"saturn","order":3,"cells":[[4,9,2],[3,5,7]]}"#,          // short
+            #"{"planet":"saturn","order":3,"cells":[[4,9,2],[3,5],[8,1,6]]}"#,    // ragged
+            #"{"planet":"sun","order":6,"cells":[[4,9,2],[3,5,7],[8,1,6]]}"#,     // order larger than the grid
+            #"{"planet":"saturn","order":2,"cells":[[4,9,2],[3,5,7],[8,1,6]]}"#,  // order smaller than the grid
+            #"{"planet":"saturn","order":3,"cells":[[4,9,2],[3,5,7],[8,1,1]]}"#,  // duplicate value
+            #"{"planet":"saturn","order":3,"cells":[[4,9,2],[3,5,7],[8,1,10]]}"#, // value outside 1…n²
+            #"{"planet":"saturn","order":0,"cells":[]}"#,                         // empty
+        ]
+        for json in malformed {
+            XCTAssertThrowsError(try JSONDecoder().decode(Kamea.self, from: Data(json.utf8)), json) { error in
+                guard case DecodingError.dataCorrupted = error else {
+                    return XCTFail("expected dataCorrupted for \(json), got \(error)")
+                }
+            }
+        }
+    }
+
+    func testOutOfRangeLookupReturnsNilInsteadOfTrapping() {
+        XCTAssertNil(Kamea.sun.value(atRow: 0, col: 1))
+        XCTAssertNil(Kamea.sun.value(atRow: 1, col: 7))
+        XCTAssertNil(Kamea.sun.value(atRow: -3, col: 2))
+        XCTAssertNil(Kamea.sun.value(atRow: 7, col: 7))
+        XCTAssertEqual(Kamea.sun.value(atRow: 6, col: 4), 4)
+        for planet in Planet.allCases {
+            let kamea = Kamea.forPlanet(planet)
+            for row in 1...kamea.order {
+                for col in 1...kamea.order {
+                    XCTAssertEqual(kamea.value(atRow: row, col: col), kamea.value(row: row, col: col))
+                }
+            }
+            XCTAssertNil(kamea.value(atRow: kamea.order + 1, col: 1))
+        }
+    }
 }

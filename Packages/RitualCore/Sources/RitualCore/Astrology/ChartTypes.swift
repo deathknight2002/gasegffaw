@@ -29,7 +29,11 @@ enum JulianDayMath {
     }
 
     /// Gregorian calendar date and decimal hour for a Julian Day (Meeus chapter 7).
+    ///
+    /// A non-finite Julian Day has no calendar date and yields the sentinel
+    /// `(0, 0, 0, jd)` (month and day 0 never occur for finite input) instead of trapping.
     static func calendar(fromJulianDay jd: Double) -> (year: Int, month: Int, day: Int, hourUT: Double) {
+        guard jd.isFinite else { return (0, 0, 0, jd) }
         let shifted = jd + 0.5
         let z = shifted.rounded(.down)
         let fraction = shifted - z
@@ -46,8 +50,10 @@ enum JulianDayMath {
     }
 
     /// Formats a Julian Day as `"YYYY-MM-DD HH:MM UT"`, rounding to the nearest minute
-    /// (carrying into the next hour/day when the rounding crosses a boundary).
+    /// (carrying into the next hour/day when the rounding crosses a boundary). A
+    /// non-finite instant prints as `"????-??-?? ??:?? UT"`.
     static func formattedUT(julianDay jd: Double) -> String {
+        guard jd.isFinite else { return "????-??-?? ??:?? UT" }
         let dayStart = (jd + 0.5).rounded(.down) - 0.5
         var minutes = Int(((jd - dayStart) * 1440.0).rounded())
         var dayJD = dayStart
@@ -98,6 +104,26 @@ public struct BirthData: Codable, Sendable, Equatable {
     /// Julian Day (UT) of the birth instant (Meeus 7.1, Gregorian calendar).
     public var jdUT: Double {
         JulianDayMath.julianDay(year: year, month: month, day: day, hourUT: hourUT)
+    }
+
+    /// Whether `hourUT`, `latitude` and `longitudeEast` are all finite.
+    ///
+    /// ``NatalChart/compute(birth:)`` requires finite input; check this first to reject
+    /// data that would otherwise be silently replaced by ``sanitized``.
+    public var isFinite: Bool {
+        hourUT.isFinite && latitude.isFinite && longitudeEast.isFinite
+    }
+
+    /// A copy in which every non-finite floating-point field (`hourUT`, `latitude`,
+    /// `longitudeEast`) is replaced by 0 — 0h UT at the Greenwich equator — so that every
+    /// downstream computation stays defined and encodable.
+    public var sanitized: BirthData {
+        BirthData(
+            year: year, month: month, day: day,
+            hourUT: hourUT.isFinite ? hourUT : 0,
+            latitude: latitude.isFinite ? latitude : 0,
+            longitudeEast: longitudeEast.isFinite ? longitudeEast : 0
+        )
     }
 
     /// 16 Aug 2002 13:00 UT, Portland OR (45.5152, −122.6784) — the chart of Appendix A.
@@ -189,7 +215,9 @@ public enum ZodiacSign: Int, CaseIterable, Codable, Sendable {
     }
 
     /// The sign containing an ecliptic longitude (any value; normalised to [0, 360)).
+    /// A non-finite longitude maps to Aries, matching ``ZodiacPosition/init(longitude:)``.
     public static func containing(longitude: Double) -> ZodiacSign {
+        guard longitude.isFinite else { return .aries }
         let normalized = Angle.normalize(longitude)
         let index = min(11, max(0, Int((normalized / 30.0).rounded(.down))))
         return ZodiacSign.allCases[index]
@@ -287,13 +315,23 @@ public enum Dignity: String, Codable, Sendable, CaseIterable {
 // MARK: - ZodiacPosition
 
 /// An ecliptic longitude with its zodiacal decomposition and Appendix A formatting.
+///
+/// Two decompositions are exposed. `sign` and `degreeInSign` are exact: the sign is the
+/// one containing `longitude`. `roundedSign`, `degrees` and `minutes` describe the
+/// position after rounding to the nearest arc-minute, *carrying* across sign boundaries,
+/// so they are always mutually consistent (`degrees` is 0…29) and `roundedSign` can be
+/// the sign after `sign` when the longitude lies within half a minute below a boundary
+/// (Pisces wraps to Aries). `formatted` prints the rounded decomposition.
 public struct ZodiacPosition: Codable, Sendable, Equatable {
     /// Ecliptic longitude in degrees, normalised to [0, 360).
     public let longitude: Double
 
     /// Creates a position, normalising `longitude` into [0, 360).
+    ///
+    /// A non-finite longitude (NaN or ±∞) has no place on the ecliptic and is mapped to
+    /// 0° Aries so that every derived property stays defined and encodable.
     public init(longitude: Double) {
-        self.longitude = Angle.normalize(longitude)
+        self.longitude = longitude.isFinite ? Angle.normalize(longitude) : 0.0
     }
 
     private enum CodingKeys: String, CodingKey {
@@ -306,37 +344,56 @@ public struct ZodiacPosition: Codable, Sendable, Equatable {
         self.init(longitude: try container.decode(Double.self, forKey: .longitude))
     }
 
-    /// Sign containing the longitude.
+    /// Sign containing the exact longitude.
     public var sign: ZodiacSign {
         ZodiacSign.containing(longitude: longitude)
     }
 
-    /// Degrees into the sign, in [0, 30).
+    /// Degrees into `sign`, in [0, 30).
     public var degreeInSign: Double {
         longitude - sign.startLongitude
     }
 
-    /// Whole degrees in sign after rounding to the nearest arc-minute (may read 30 when
-    /// the minutes carry, e.g. 29°59.6' → 30°00'; the sign is *not* advanced).
+    /// Sign of the position after rounding to the nearest arc-minute: equals `sign` unless
+    /// the minutes carry past 29°59′, in which case it is the following sign.
+    public var roundedSign: ZodiacSign {
+        ZodiacSign.allCases[roundedTotalMinutes / Self.minutesPerSign]
+    }
+
+    /// Whole degrees into `roundedSign` (0…29) after rounding to the nearest arc-minute;
+    /// a carry past 29°59′ advances `roundedSign` and reads 0°00′.
     public var degrees: Int {
-        roundedMinutesInSign / 60
+        (roundedTotalMinutes % Self.minutesPerSign) / 60
     }
 
     /// Arc-minutes after rounding to the nearest minute (0…59).
     public var minutes: Int {
-        roundedMinutesInSign % 60
+        roundedTotalMinutes % 60
     }
 
-    /// Total arc-minutes into the sign, rounded to the nearest minute.
-    private var roundedMinutesInSign: Int {
-        Int((degreeInSign * 60.0).rounded())
+    /// Arc-minutes in one sign (30 × 60).
+    private static let minutesPerSign = 1800
+    /// Arc-minutes in the full circle (360 × 60).
+    private static let minutesPerCircle = 21_600
+
+    /// The longitude rounded to the nearest arc-minute, as whole minutes from 0° Aries in
+    /// [0, 21600). The minutes within the exact sign are rounded first so the value carries
+    /// into the next sign (and from Pisces round to Aries) exactly when they reach 30°00′.
+    private var roundedTotalMinutes: Int {
+        let minutesInSign = Int((degreeInSign * 60.0).rounded())
+        return (sign.rawValue * Self.minutesPerSign + minutesInSign) % Self.minutesPerCircle
     }
 
-    /// Appendix A form, e.g. `"23°30' Leo (143.494°)"`.
+    /// Appendix A form, e.g. `"23°30' Leo (143.494°)"`: the rounded decomposition and the
+    /// decimal longitude to three places. A decimal that rounds up to `360.000` is printed
+    /// as `0.000` so the report never leaves [0, 360).
     public var formatted: String {
         let minuteText = String(format: "%02d", minutes)
-        let longitudeText = String(format: "%.3f", longitude)
-        return "\(degrees)°\(minuteText)' \(sign.name) (\(longitudeText)°)"
+        var longitudeText = String(format: "%.3f", longitude)
+        if longitudeText == "360.000" {
+            longitudeText = "0.000"
+        }
+        return "\(degrees)°\(minuteText)' \(roundedSign.name) (\(longitudeText)°)"
     }
 }
 

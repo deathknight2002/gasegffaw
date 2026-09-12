@@ -188,6 +188,24 @@ public enum InputKind: Codable, Sendable, Equatable {
     case flick(velocity: RVec2, ring: Int?)
     /// Camera yaw set to the given degrees.
     case cameraYaw(Double)
+
+    /// Whether every floating-point payload is finite.
+    ///
+    /// `RitualSimulation.apply` refuses inputs for which this is false (NaN or ±∞ yaw,
+    /// trace point or flick velocity), since they would break the state's invariants and
+    /// its JSON encoding. Payload-free inputs are always finite.
+    public var isFinite: Bool {
+        switch self {
+        case .holdBegin, .holdEnd, .traceEnd, .tap:
+            return true
+        case .tracePoint(let point):
+            return point.x.isFinite && point.y.isFinite
+        case .flick(let velocity, _):
+            return velocity.x.isFinite && velocity.y.isFinite
+        case .cameraYaw(let yaw):
+            return yaw.isFinite
+        }
+    }
 }
 
 /// An input stamped with the tick it applies to. The simulation consumes inputs in log order.

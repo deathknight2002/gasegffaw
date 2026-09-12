@@ -62,24 +62,29 @@ public struct SigilDynamics: Codable, Sendable, Equatable {
     public static let ringMasses: [Double] = [0.30, 0.25, 0.20, 0.16, 0.12]
     /// Number of rings.
     public static let ringCount = 5
-    /// Default viscous friction coefficient in N·m·s.
-    public static let defaultViscous = 0.35
-    /// Default Coulomb friction torque in N·m.
-    public static let defaultCoulomb = 0.02
-    /// Default coupling coefficient between adjacent rings in N·m·s.
-    public static let defaultCoupling = 0.15
+    /// Default viscous friction coefficient in N·m·s (CORE_API): ring 0 spins down with
+    /// `τ = I₀ / viscous ≈ 5.6 s`, so its momentum is visibly conserved between flicks.
+    public static let defaultViscous = 0.03
+    /// Default Coulomb friction torque in N·m (CORE_API); brings the rings to an exact stop.
+    public static let defaultCoulomb = 0.008
+    /// Default coupling coefficient between adjacent rings in N·m·s (CORE_API).
+    public static let defaultCoupling = 0.12
     /// Flick speeds are clamped to this magnitude before the impulse is computed.
     public static let maxFlickSpeed = 4.0
-    /// Angular impulse per unit of (clamped) flick speed, in N·m·s.
+    /// Upper bound applied to `frictionScale` in ``step(dt:frictionScale:)``.
     ///
-    /// CORE_API lists 0.06, but with the contract friction and coupling coefficients that
-    /// value peaks the manifest charge at 0.08: the rings spin down in well under a second,
-    /// so `∫E dt` over the three autopilot flicks is ~0.1 J·s against `E_ref = 1.2 J·s`.
-    /// The coefficients were kept and only this constant was raised. 0.24 is the smallest
-    /// round value at which the *third* autopilot flick tips the charge over 1 (at 3.04 s
-    /// into the spin stage with `frictionScale = 1`); 0.20 never reaches 1 and ≥ 0.26
-    /// ignites before the third flick. Peak rim speed is then ≈ 8 rad/s on ring 0.
-    public static let flickImpulsePerSpeed = 0.24
+    /// The viscous and coupling torques are integrated explicitly, which is stable only
+    /// while `(viscous·scale + 2·coupling)·dt / I_min < 2` (≈ scale 73 for the innermost
+    /// ring at 120 Hz) and free of overshoot below half that. Clamping at 10 keeps every
+    /// ring's decay monotone with a threefold margin while covering the 0–3 debug slider
+    /// generously; scales above the clamp behave exactly like the clamp.
+    public static let maxFrictionScale = 10.0
+    /// Angular impulse per unit of (clamped) flick speed, in N·m·s (CORE_API).
+    ///
+    /// A full-speed autopilot flick (`|v| = 3.5`) delivers `J ≈ 1.2 N·m·s`, spinning ring 0
+    /// up to ≈ 7 rad/s; with `E_ref = 20 J·s` the three autopilot flicks charge the
+    /// manifestation a few seconds after the third one.
+    public static let flickImpulsePerSpeed = 0.35
     /// Fraction of the flick impulse delivered to each adjacent ring (negative = counter-rotation).
     public static let adjacentImpulseFraction = -0.5
     /// Spark shedding rate per unit of rim speed: sparks/s per (rad/s·m).
@@ -131,10 +136,11 @@ public struct SigilDynamics: Codable, Sendable, Equatable {
     /// - Parameters:
     ///   - dt: Time step in seconds (the simulation uses `1/120`).
     ///   - frictionScale: Multiplier applied to both `viscous` and `coulomb` (the
-    ///     debug-panel friction slider); the coupling coefficient is not scaled.
+    ///     debug-panel friction slider), clamped to `0…maxFrictionScale`; the coupling
+    ///     coefficient is not scaled.
     public mutating func step(dt: Double, frictionScale: Double) {
         guard dt > 0, !rings.isEmpty else { return }
-        let scale = max(0, frictionScale)
+        let scale = min(max(0, frictionScale), Self.maxFrictionScale)
         let viscousCoefficient = viscous * scale
         let coulombTorque = coulomb * scale
         let startOmegas = rings.map(\.omega)
@@ -173,8 +179,16 @@ public struct SigilDynamics: Codable, Sendable, Equatable {
     /// impulse; each adjacent ring receives `adjacentImpulseFraction` (−0.5) of it, so
     /// neighbours counter-rotate.
     ///
+    /// Convention for callers (the app's gesture recogniser): `velocity` is expressed in
+    /// the ring's local frame with +x along the tangent at the touch point in the
+    /// direction of increasing angle. The input carries no touch position, so the core
+    /// cannot project a screen-space swipe onto the ring itself; a recogniser must rotate
+    /// the swipe velocity into this frame before emitting `InputKind.flick`, otherwise a
+    /// radial swipe (x ≈ 0) would still deliver the full |v| impulse with a +x sign.
+    ///
     /// - Parameters:
-    ///   - velocity: Gesture velocity in normalised sigil-plane units per second.
+    ///   - velocity: Gesture velocity in the ring's tangential frame (see above), in
+    ///     normalised sigil-plane units per second.
     ///   - ring: Index of the ring under the finger (0…4), or `nil` for the outer ring.
     ///     Out-of-range indices are clamped to the nearest ring.
     public mutating func applyFlick(velocity: RVec2, ring: Int?) {

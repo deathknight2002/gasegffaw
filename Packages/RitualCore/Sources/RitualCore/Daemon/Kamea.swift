@@ -28,6 +28,28 @@ public struct Kamea: Codable, Sendable, Equatable {
         self.cells = cells
     }
 
+    private enum CodingKeys: String, CodingKey {
+        case planet, order, cells
+    }
+
+    /// Decodes a square, rejecting any grid that is not `order × order` or that does not
+    /// hold every value `1…order²` exactly once (`DecodingError.dataCorrupted`), so a
+    /// decoded kamea satisfies the same invariant as the built-in squares and every
+    /// lookup stays in bounds.
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let planet = try container.decode(Planet.self, forKey: .planet)
+        let order = try container.decode(Int.self, forKey: .order)
+        let cells = try container.decode([[Int]].self, forKey: .cells)
+        guard Self.isValidGrid(order: order, cells: cells) else {
+            let message = "kamea cells must form an \(order)×\(order) grid holding 1…\(order * order) exactly once"
+            throw DecodingError.dataCorruptedError(forKey: .cells, in: container, debugDescription: message)
+        }
+        self.planet = planet
+        self.order = order
+        self.cells = cells
+    }
+
     /// The constant every row, column and main diagonal sums to: `n(n² + 1) / 2`.
     public var magicSum: Int {
         order * (order * order + 1) / 2
@@ -35,12 +57,35 @@ public struct Kamea: Codable, Sendable, Equatable {
 
     /// Value at a 1-based cell.
     ///
+    /// Traps (`precondition`) when `row` or `col` lies outside `1…order`; use
+    /// ``value(atRow:col:)`` for a lookup that returns `nil` instead.
+    ///
     /// - Parameters:
     ///   - row: Row 1…order, counted from the top.
     ///   - col: Column 1…order, counted from the left.
     public func value(row: Int, col: Int) -> Int {
         precondition((1...order).contains(row) && (1...order).contains(col), "kamea cell out of range")
         return cells[row - 1][col - 1]
+    }
+
+    /// Value at a 1-based cell, or `nil` when `row` or `col` lies outside `1…order`.
+    ///
+    /// - Parameters:
+    ///   - row: Row 1…order, counted from the top.
+    ///   - col: Column 1…order, counted from the left.
+    public func value(atRow row: Int, col: Int) -> Int? {
+        guard (1...order).contains(row), (1...order).contains(col) else { return nil }
+        return cells[row - 1][col - 1]
+    }
+
+    /// Whether `cells` is an `order × order` grid holding every value `1…order²` exactly once.
+    ///
+    /// - Parameters:
+    ///   - order: Expected side length.
+    ///   - cells: Rows to check.
+    static func isValidGrid(order: Int, cells: [[Int]]) -> Bool {
+        guard order >= 1, cells.count == order, cells.allSatisfy({ $0.count == order }) else { return false }
+        return Set(cells.joined()) == Set(1...(order * order))
     }
 
     /// 1-based cell holding `value`, or `nil` if the value is outside `1…n²`.

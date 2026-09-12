@@ -7,7 +7,8 @@
 //  Role: `lighting_direct` reconstructs the world position from reversed-Z depth,
 //  reads the G-buffer, builds a CDF over the lights' importance
 //  luminance(I) / (d² + r²), picks ONE light with hash_unit(seed, frameIndex, pixel, 0),
-//  samples a point on its surface (sphere / daemon: uniform on the sphere; ring:
+//  samples a point on its surface (sphere / daemon: area-uniform on the spherical cap
+//  visible from the shaded point, so no sample lands on the light's far side; ring:
 //  uniform angles on the torus), traces a shadow ray (kRenderPath == RENDER_PATH_RT:
 //  RT.h `rtShadowRay`; fallback: SDF.h `sdfSoftShadow`) and weights the sample by
 //  1 / (P(light) · pdf_area) — a one-sample estimator over all lights, unbiased.
@@ -49,12 +50,18 @@ struct EmitterSample {
     float shadowRadius;     ///< radius handed to the SDF cone shadow (tube / sphere radius)
 };
 
-/// Samples a point on `light` with two uniforms. Sphere and daemon lights are uniform
-/// on the sphere surface (pdf = 1 / 4πr²), rings uniform in (θ, φ) on the torus
-/// (pdf_area = 1 / (4π² r (R + r cos φ))). The emitted radiance follows from the
-/// radiant-intensity convention in LightShading.h: sphere L_e = I / (π r²) (projected
-/// disc), ring L_e = I / (4π R r) (on-axis projected annulus).
-inline EmitterSample sample_emitter(LightData light, float2 xi) {
+/// Samples a point on `light` with two uniforms, as seen from `shadingPoint`.
+///
+/// Sphere and daemon lights are sampled area-uniformly on the spherical cap that is
+/// visible from `shadingPoint`: a surface point X = C + r·n of the sphere faces P iff
+/// n · (P − X) > 0 ⇔ n · axis > r / d with axis = (P − C) / d, so the cap
+/// cos θ ∈ [r / d, 1] is exactly the visible set (area 2πr²(1 − r/d),
+/// pdf_area = 1 / that). Every sample therefore has cos θ_l > 0; a shaded point inside
+/// the sphere falls back to the whole sphere (pdf 1 / 4πr²). Rings are uniform in
+/// (θ, φ) on the torus (pdf_area = 1 / (4π² r (R + r cos φ))). The emitted radiance
+/// follows from the radiant-intensity convention in LightShading.h: sphere
+/// L_e = I / (π r²) (projected disc), ring L_e = I / (4π R r) (on-axis projected annulus).
+inline EmitterSample sample_emitter(LightData light, float3 shadingPoint, float2 xi) {
     EmitterSample sample;
     float3 color = light_color(light);
     if (light.type == LIGHT_TYPE_RING) {
@@ -73,11 +80,26 @@ inline EmitterSample sample_emitter(LightData light, float2 xi) {
         sample.shadowRadius = tubeRadius;
     } else {
         float radius = max(light.radius, 1e-3f);
-        float3 direction = sample_sphere_direction(xi);
+        float3 toShadingPoint = shadingPoint - light.position;
+        float centerDistance = length(toShadingPoint);
+        float3 direction;
+        if (centerDistance > radius * 1.001f) {
+            // Visible cap: cos θ uniform in [r/d, 1] around the axis toward the shaded point.
+            float3 axis = toShadingPoint / centerDistance;
+            float cosMax = radius / centerDistance;
+            float cosTheta = 1.0f - xi.x * (1.0f - cosMax);
+            float sinTheta = sqrt(max(0.0f, 1.0f - cosTheta * cosTheta));
+            float phi = kTwoPi * xi.y;
+            float3 local = float3(sinTheta * cos(phi), sinTheta * sin(phi), cosTheta);
+            direction = to_world_basis(local, axis);
+            sample.invAreaPdf = kTwoPi * radius * radius * (1.0f - cosMax);
+        } else {
+            direction = sample_sphere_direction(xi);
+            sample.invAreaPdf = 4.0f * kPi * radius * radius;
+        }
         sample.position = light.position + radius * direction;
         sample.normal = direction;
         sample.radiance = color / (kPi * radius * radius);
-        sample.invAreaPdf = 4.0f * kPi * radius * radius;
         sample.shadowRadius = radius;
     }
     return sample;
@@ -168,7 +190,7 @@ kernel void lighting_direct(constant FrameUniforms &u [[buffer(BufferIndexFrameU
         if (chosen != 0xFFFFFFFFu) {
             float selectProbability = importance[chosen] / total;
             float2 xi = hash_unit2(u.seedLo, u.seedHi, u.frameIndex, pixelIndex, 1u);
-            EmitterSample emitter = sample_emitter(lights[chosen], xi);
+            EmitterSample emitter = sample_emitter(lights[chosen], position, xi);
             float3 toSample = emitter.position - position;
             float distance = length(toSample);
             if (distance > 1e-4f) {

@@ -197,6 +197,21 @@ final class FoundationTests: XCTestCase {
         XCTAssertNotEqual(Hash.u32(5, 1, 2, 3), Hash.u32(5, 2, 2, 3))
     }
 
+    /// Documented property (CORE_API, ARCHITECTURE §6): only `seed_lo ^ seed_hi` enters the
+    /// first avalanche, so seeds with equal XOR of their words produce identical streams
+    /// for every key — a seed carries 32 bits of entropy into `Hash`.
+    func testHashSeedEntropyIsTheXorOfTheSeedWords() {
+        let keys: [(UInt32, UInt32, UInt32)] = [(1, 2, 3), (0, 0, 0), (0xdead, 0xbeef, 7), (UInt32.max, 5, 9)]
+        for (a, b, c) in keys {
+            XCTAssertEqual(Hash.u32(0x0000_0001_0000_0001, a, b, c), Hash.u32(0, a, b, c))
+            XCTAssertEqual(Hash.u32(1 << 32, a, b, c), Hash.u32(1, a, b, c))
+            XCTAssertEqual(Hash.u32(0xffff_ffff_0000_0000, a, b, c), Hash.u32(0x0000_0000_ffff_ffff, a, b, c))
+            XCTAssertEqual(Hash.u32(0x1234_5678_9abc_def0, a, b, c), Hash.u32(UInt64(0x1234_5678 ^ 0x9abc_def0), a, b, c))
+            XCTAssertNotEqual(Hash.u32(0x0000_0001_0000_0000, a, b, c), Hash.u32(0x0000_0002_0000_0000, a, b, c),
+                              "distinct XORs still give distinct streams")
+        }
+    }
+
     func testHashUnitIsU32Over2Pow32() {
         let u = Hash.unit(1, 2, 3, 4)
         XCTAssertEqual(u, Double(0x8f0b_a4b8) / 4_294_967_296.0)
@@ -218,19 +233,85 @@ final class FoundationTests: XCTestCase {
         XCTAssertEqual(ZodiacPosition(longitude: 400).formatted, "10°00' Taurus (40.000°)")
     }
 
-    /// Minute rounding carries into the degree field but never advances the sign: the
-    /// sign is decided by the exact longitude, so 29.9999° is still Aries and prints as
-    /// `30°00'`. Appendix A never hits this edge, but the behaviour is fixed here.
-    func testZodiacPositionMinuteCarryDoesNotWrapSign() {
+    /// Minute rounding carries across the sign boundary: 29°59.994′ Aries rounds to 30°00′,
+    /// which is 0°00′ Taurus. The exact `sign` stays Aries; the rounded decomposition
+    /// (`roundedSign`, `degrees`, `minutes`) and `formatted` advance together, and the
+    /// decimal never prints 360.000.
+    func testZodiacPositionMinuteCarryAdvancesTheSign() {
         let position = ZodiacPosition(longitude: 29.9999)
         XCTAssertEqual(position.sign, .aries)
-        XCTAssertEqual(position.degrees, 30)
+        XCTAssertEqual(position.roundedSign, .taurus)
+        XCTAssertEqual(position.degrees, 0)
         XCTAssertEqual(position.minutes, 0)
-        XCTAssertEqual(position.formatted, "30°00' Aries (30.000°)")
+        XCTAssertEqual(position.formatted, "0°00' Taurus (30.000°)")
+
+        XCTAssertEqual(ZodiacPosition(longitude: 149.995).formatted, "0°00' Virgo (149.995°)")
+        XCTAssertEqual(ZodiacPosition(longitude: 149.9999).formatted, "0°00' Virgo (150.000°)")
+        XCTAssertEqual(ZodiacPosition(longitude: 89.99999).formatted, "0°00' Cancer (90.000°)")
+        let wrap = ZodiacPosition(longitude: 359.9999)
+        XCTAssertEqual(wrap.sign, .pisces)
+        XCTAssertEqual(wrap.roundedSign, .aries)
+        XCTAssertEqual(wrap.degrees, 0)
+        XCTAssertEqual(wrap.minutes, 0)
+        XCTAssertEqual(wrap.formatted, "0°00' Aries (0.000°)")
 
         let halfMinute = ZodiacPosition(longitude: 120 + 12.0 + 59.5 / 60.0)  // 12°59.5' Leo
         XCTAssertEqual(halfMinute.degrees, 13)
         XCTAssertEqual(halfMinute.minutes, 0)
+        XCTAssertEqual(halfMinute.roundedSign, .leo)
+        // Just under half a minute below the boundary does not carry.
+        XCTAssertEqual(ZodiacPosition(longitude: 29.0 + 59.4 / 60.0).formatted, "29°59' Aries (29.990°)")
+        for sign in ZodiacSign.allCases {
+            let inside = ZodiacPosition(longitude: sign.startLongitude + 15.5)
+            XCTAssertEqual(inside.roundedSign, inside.sign)
+            XCTAssertEqual(inside.degrees, 15)
+            XCTAssertEqual(inside.minutes, 30)
+        }
+    }
+
+    /// Non-finite input must never reach an `Int(Double)` conversion: positions map to
+    /// 0° Aries, the calendar and ΔT return sentinels, and `NatalChart.compute` sanitises
+    /// the birth data (documented as 0 for each non-finite field) so the chart stays
+    /// defined and encodable.
+    func testNonFiniteAstrologyInputsDoNotTrap() throws {
+        for value in [Double.nan, .infinity, -.infinity] {
+            let position = ZodiacPosition(longitude: value)
+            XCTAssertEqual(position.longitude, 0)
+            XCTAssertEqual(position.sign, .aries)
+            XCTAssertEqual(position.roundedSign, .aries)
+            XCTAssertEqual(position.formatted, "0°00' Aries (0.000°)")
+            XCTAssertEqual(ZodiacSign.containing(longitude: value), .aries)
+            XCTAssertTrue(JulianDay.deltaT(jd: value).isNaN)
+            let calendar = JulianDay.toCalendar(value)
+            XCTAssertEqual(calendar.year, 0)
+            XCTAssertEqual(calendar.month, 0)
+            XCTAssertEqual(calendar.day, 0)
+            XCTAssertEqual(Syzygy(kind: .newMoon, jdUT: value, longitude: 10).formattedInstantUT, "????-??-?? ??:?? UT")
+        }
+        XCTAssertTrue(BirthData.owner.isFinite)
+        XCTAssertEqual(BirthData.owner.sanitized, BirthData.owner)
+
+        var nanHour = BirthData.owner
+        nanHour.hourUT = .nan
+        XCTAssertFalse(nanHour.isFinite)
+        var zeroHour = BirthData.owner
+        zeroHour.hourUT = 0
+        XCTAssertEqual(nanHour.sanitized, zeroHour)
+        XCTAssertEqual(NatalChart.compute(birth: nanHour), NatalChart.compute(birth: zeroHour))
+
+        var infiniteLatitude = BirthData.owner
+        infiniteLatitude.latitude = .infinity
+        var zeroLatitude = BirthData.owner
+        zeroLatitude.latitude = 0
+        let chart = NatalChart.compute(birth: infiniteLatitude)
+        XCTAssertEqual(chart, NatalChart.compute(birth: zeroLatitude))
+        XCTAssertEqual(chart.birth, zeroLatitude, "the chart records the sanitised birth data")
+        XCTAssertNoThrow(try JSONEncoder().encode(chart))
+        XCTAssertFalse(chart.appendixAReport().contains("nan"))
+
+        var nanLongitude = BirthData.owner
+        nanLongitude.longitudeEast = -.infinity
+        XCTAssertNoThrow(try JSONEncoder().encode(NatalChart.compute(birth: nanLongitude)))
     }
 
     func testZodiacPositionDecomposition() {

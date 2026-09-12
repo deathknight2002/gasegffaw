@@ -162,6 +162,147 @@ final class DeterminismTests: XCTestCase {
         XCTAssertEqual(try JSONDecoder().decode(SimConfig.self, from: JSONEncoder().encode(config)), config)
     }
 
+    /// Non-finite gesture payloads (NaN/±∞ yaw, trace point, flick velocity) are refused at
+    /// the boundary: never logged, never applied, so state, keyframes and the input log
+    /// keep their invariants and stay JSON-encodable.
+    func testNonFiniteInputsAreDroppedAndTheStateStaysEncodable() throws {
+        let simulation = RitualSimulation(seed: 1)
+        simulation.apply(RitualInput(tick: 0, kind: .cameraYaw(90)))
+        simulation.step()
+        let logBefore = simulation.inputLog
+        let badInputs: [InputKind] = [
+            .cameraYaw(.nan), .cameraYaw(.infinity), .cameraYaw(-.infinity),
+            .tracePoint(RVec2(.nan, 0.5)), .tracePoint(RVec2(0.5, -.infinity)),
+            .flick(velocity: RVec2(.nan, 0), ring: 0), .flick(velocity: RVec2(1, .infinity), ring: nil),
+        ]
+        for kind in badInputs {
+            XCTAssertFalse(kind.isFinite)
+            simulation.apply(RitualInput(tick: simulation.tick, kind: kind))
+        }
+        XCTAssertEqual(simulation.inputLog, logBefore, "non-finite inputs are not logged")
+        simulation.step(ticks: 240)
+        XCTAssertEqual(simulation.state.cameraYaw, 90)
+        XCTAssertTrue(simulation.state.trace.isEmpty)
+        XCTAssertTrue(simulation.state.sigil.isAtRest)
+        XCTAssertNoThrow(try JSONEncoder().encode(simulation.state))
+        XCTAssertNoThrow(try JSONEncoder().encode(simulation.keyframes))
+        XCTAssertNoThrow(try JSONEncoder().encode(simulation.inputLog))
+        for kind in [InputKind.holdBegin, .holdEnd, .traceEnd, .tap, .cameraYaw(0), .tracePoint(.zero), .flick(velocity: .zero, ring: nil)] {
+            XCTAssertTrue(kind.isFinite)
+        }
+
+        // In the stages that consume the payloads: a trace while facing East, a flick while spinning.
+        let air = RitualSimulation(seed: 1)
+        air.jump(to: .air)
+        air.apply(RitualInput(tick: air.tick, kind: .cameraYaw(90)))
+        air.apply(RitualInput(tick: air.tick, kind: .tracePoint(RVec2(.nan, 0.5))))
+        air.apply(RitualInput(tick: air.tick, kind: .tracePoint(RVec2(0.5, .infinity))))
+        air.step()
+        XCTAssertTrue(air.state.facingQuarter)
+        XCTAssertTrue(air.state.trace.isEmpty)
+        XCTAssertNoThrow(try JSONEncoder().encode(air.state))
+
+        let spin = RitualSimulation(seed: 1)
+        spin.jump(to: .sigilSpin)
+        let twin = RitualSimulation(seed: 1)
+        twin.jump(to: .sigilSpin)
+        spin.apply(RitualInput(tick: spin.tick, kind: .flick(velocity: RVec2(.infinity, 0), ring: 0)))
+        spin.apply(RitualInput(tick: spin.tick, kind: .flick(velocity: RVec2(.nan, .nan), ring: 2)))
+        spin.step(ticks: 10)
+        twin.step(ticks: 10)
+        XCTAssertEqual(spin.state, twin.state)
+        XCTAssertEqual(spin.inputLog, twin.inputLog)
+        XCTAssertNoThrow(try JSONEncoder().encode(spin.state))
+
+        // `RitualState.consume` guards on its own as well (bypassing `apply`).
+        var state = RitualState()
+        XCTAssertTrue(state.consume(.cameraYaw(.nan), tick: 0).isEmpty)
+        XCTAssertTrue(state.consume(.cameraYaw(.infinity), tick: 0).isEmpty)
+        XCTAssertEqual(state, RitualState())
+    }
+
+    /// `RitualState` encodes with a value-determined layout: `completedStages` sorted by
+    /// stage number, `candles` and `completedTick` as keyed objects (not hash-ordered
+    /// flat arrays), so equal states produce identical bytes under `.sortedKeys` in every
+    /// process (ARCHITECTURE §6).
+    func testStateEncodingLayoutIsDeterministic() throws {
+        let simulation = scriptedSimulation(seed: 12)
+        simulation.step(ticks: 2000)
+        let state = simulation.state
+        XCTAssertGreaterThan(state.completedStages.count, 1)
+        XCTAssertGreaterThan(state.completedTick.count, 1)
+
+        let sorted = JSONEncoder()
+        sorted.outputFormatting = [.sortedKeys]
+        let first = try sorted.encode(state)
+        let again = JSONEncoder()
+        again.outputFormatting = [.sortedKeys]
+        XCTAssertEqual(first, try again.encode(state))
+
+        let object = try XCTUnwrap(JSONSerialization.jsonObject(with: first) as? [String: Any])
+        let candles = try XCTUnwrap(object["candles"] as? [String: Any], "candles must be a keyed object")
+        XCTAssertEqual(Set(candles.keys), Set(Quarter.allCases.map(\.rawValue)))
+        let ticks = try XCTUnwrap(object["completedTick"] as? [String: Any], "completedTick must be a keyed object")
+        XCTAssertEqual(Set(ticks.keys), Set(state.completedTick.keys.map(\.id)))
+        for (stage, tick) in state.completedTick {
+            XCTAssertEqual(ticks[stage.id] as? Int, tick)
+        }
+        let stages = try XCTUnwrap(object["completedStages"] as? [Int])
+        XCTAssertEqual(stages, state.completedStages.map(\.rawValue).sorted())
+
+        // The plain (unsorted) encoding carries the same layout and round-trips too; only
+        // `.sortedKeys` fixes the byte order of keyed objects, which is why it is the
+        // documented way to compare keyframes or manifests byte for byte.
+        let plain = try JSONEncoder().encode(state)
+        let plainObject = try XCTUnwrap(JSONSerialization.jsonObject(with: plain) as? [String: Any])
+        XCTAssertNotNil(plainObject["candles"] as? [String: Any])
+        XCTAssertNotNil(plainObject["completedTick"] as? [String: Any])
+        XCTAssertEqual(try XCTUnwrap(plainObject["completedStages"] as? [Int]), stages)
+
+        XCTAssertEqual(try JSONDecoder().decode(RitualState.self, from: first), state)
+        XCTAssertEqual(try JSONDecoder().decode(RitualState.self, from: plain), state)
+        let keyframe = try XCTUnwrap(simulation.keyframes.last)
+        XCTAssertEqual(try sorted.encode(keyframe), try again.encode(keyframe))
+        XCTAssertEqual(try JSONDecoder().decode(Keyframe.self, from: try sorted.encode(keyframe)), keyframe)
+    }
+
+    /// `lastStepEvents` is empty after every `seek`, whether it steps forward from the
+    /// current position or restores a keyframe and replays — even when the landing tick
+    /// raised events — so a haptics layer keyed on it never re-fires on a scrub.
+    func testSeekLeavesNoStepEvents() throws {
+        let probe = scriptedSimulation(seed: 1)
+        var landing: Int?
+        while landing == nil, probe.tick < 5000 {
+            probe.step()
+            if probe.lastStepEvents.contains(.stageCompleted(.oath)) {
+                landing = probe.tick
+            }
+        }
+        let oathLanding = try XCTUnwrap(landing, "the autopilot completes the oath")
+        XCTAssertGreaterThan(oathLanding, RitualSimulation.keyframeInterval)
+
+        // Forward path: already between the keyframe and the target.
+        let simulation = scriptedSimulation(seed: 1)
+        simulation.step(ticks: oathLanding - 60)
+        simulation.seek(toTick: oathLanding)
+        XCTAssertEqual(simulation.state.completedTick[.oath], oathLanding - 1)
+        XCTAssertTrue(simulation.lastStepEvents.isEmpty, "forward seek onto a completion tick")
+
+        // Restore-and-replay path.
+        simulation.step(ticks: 100)
+        simulation.seek(toTick: oathLanding)
+        XCTAssertEqual(simulation.tick, oathLanding)
+        XCTAssertTrue(simulation.lastStepEvents.isEmpty, "restore-and-replay seek onto a completion tick")
+        simulation.seek(toTick: oathLanding)
+        XCTAssertTrue(simulation.lastStepEvents.isEmpty, "no-op seek")
+
+        // A plain step still reports its events.
+        simulation.seek(toTick: oathLanding - 1)
+        simulation.step()
+        XCTAssertEqual(simulation.lastStepEvents, [.stageCompleted(.oath)])
+        XCTAssertEqual(simulation.state.lastEvent, .stageCompleted(.oath), "the state's own lastEvent is unaffected")
+    }
+
     func testStepZeroOrNegativeTicksIsANoOp() {
         let simulation = RitualSimulation(seed: 1)
         simulation.step(ticks: 0)

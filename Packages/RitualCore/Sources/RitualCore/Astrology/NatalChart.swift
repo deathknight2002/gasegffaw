@@ -12,9 +12,15 @@ extension NatalChart {
     /// are computed, so a chart ruler other than the luminaries has no position, is
     /// reported as peregrine and never as rising.
     ///
+    /// The chart requires finite `hourUT`, `latitude` and `longitudeEast`; a non-finite
+    /// field is replaced by 0 (``BirthData/sanitized``) before anything is computed, and
+    /// the sanitised data is what the returned chart records as `birth`. Check
+    /// ``BirthData/isFinite`` first to reject such input instead.
+    ///
     /// - Parameter birth: Date, time (UT) and place of birth.
     /// - Returns: The fully derived ``NatalChart``.
     public static func compute(birth: BirthData) -> NatalChart {
+        let birth = birth.sanitized
         let jdUT = birth.jdUT
         let jdTT = JulianDay.terrestrialTime(fromUT: jdUT)
 

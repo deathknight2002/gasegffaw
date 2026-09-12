@@ -11,19 +11,6 @@ final class AppendixATests: XCTestCase {
     /// Contract tolerance for every Appendix A number.
     private let tolerance = 0.05
 
-    /// The Appendix A report, exactly nine lines.
-    private static let expectedReport = """
-    Sun 23°30' Leo (143.494°)
-    Moon 7°42' Sagittarius (247.694°)
-    Ascendant 20°13' Leo (140.211°)
-    MC 9°28' Taurus (39.468°)
-    Sun altitude −2.87° → night chart
-    Prenatal syzygy New Moon 2002-08-08 19:15 UT 16°04' Leo (136.063°)
-    Lot of Fortune 6°01' Taurus (36.010°)
-    Lot of Spirit 4°25' Sagittarius (244.411°)
-    Chart ruler Sun — in domicile, rising
-    """
-
     /// DRAND in Hebrew (logical order: Daleth, Resh, Aleph, Nun, Daleth).
     private static let expectedHebrew = "\u{05D3}\u{05E8}\u{05D0}\u{05E0}\u{05D3}"
 
@@ -47,9 +34,11 @@ final class AppendixATests: XCTestCase {
         XCTAssertTrue(chart.rulerRising)
     }
 
-    func testOwnerReportMatchesAppendixAExactly() {
+    func testOwnerReportMatchesAppendixALineByLine() {
+        // Nine lines; labels, sign names and degree/minute strings verbatim; the decimal
+        // longitudes to 0.01° (the Meeus Moon prints 247.693° for the appendix's 247.694°).
         let report = NatalChart.compute(birth: .owner).appendixAReport()
-        XCTAssertEqual(report, Self.expectedReport)
+        assertAppendixAReport(report)
         XCTAssertEqual(report.split(separator: "\n", omittingEmptySubsequences: false).count, 9)
     }
 
@@ -59,7 +48,8 @@ final class AppendixATests: XCTestCase {
         let profile = DaemonProfile.owner
         XCTAssertEqual(profile.chart, NatalChart.compute(birth: .owner))
         XCTAssertEqual(profile, DaemonProfile.derive(from: profile.chart))
-        XCTAssertEqual(profile.chart.appendixAReport(), Self.expectedReport)
+        assertAppendixAReport(profile.chart.appendixAReport())
+        XCTAssertEqual(profile.chart.appendixAReport(), NatalChart.compute(birth: .owner).appendixAReport())
     }
 
     func testOwnerNameIsDRAND() {

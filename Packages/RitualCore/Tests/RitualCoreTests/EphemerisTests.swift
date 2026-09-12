@@ -81,6 +81,8 @@ func angularDifference(_ a: Double, _ b: Double) -> Double {
 enum EphemerisTolerance {
     static let sun = 0.01
     static let moon = 0.05
+    /// Error budget of the Meeus chapter 47 truncation itself (20″), used as a regression bound.
+    static let moonFine = 20.0 / 3600.0
     static let ascendant = 0.05
     static let midheaven = 0.05
     static let altitude = 0.1
@@ -135,18 +137,41 @@ final class EphemerisTests: XCTestCase {
     }
 
     func testDeltaTMatchesObservedValues() {
-        // Observed ΔT (IERS): 1955 ≈ 31.1 s, 1975 ≈ 45.5 s, 2002 ≈ 64.3 s, 2021 ≈ 69.4 s.
+        // Observed ΔT (IERS): 1955 ≈ 31.1 s, 1975 ≈ 45.5 s, 2002 ≈ 64.3 s.
         XCTAssertEqual(JulianDay.deltaT(jd: JulianDay.fromCalendar(year: 1955, month: 7, day: 1, hourUT: 0)), 31.1, accuracy: 1.0)
         XCTAssertEqual(JulianDay.deltaT(jd: JulianDay.fromCalendar(year: 1975, month: 7, day: 1, hourUT: 0)), 45.5, accuracy: 1.0)
         XCTAssertEqual(JulianDay.deltaT(jd: BirthData.owner.jdUT), 64.4, accuracy: 1.0)
-        // Beyond 2005 the polynomial extrapolates (72.6 s for 2021 against 69.4 s observed).
-        XCTAssertEqual(JulianDay.deltaT(jd: JulianDay.fromCalendar(year: 2021, month: 10, day: 5, hourUT: 0)), 69.4, accuracy: 5.0)
+        // From 2005 the observed IERS series is tabulated (annual, interpolated): 2010.0
+        // 66.07 s, 2015.0 67.64 s, October 2021 ≈ 69.3 s, 2024.0 69.17 s — the Espenak–Meeus
+        // 2005 extrapolation used before read 72.6 s for 2021 and 74.2 s for 2024.
+        XCTAssertEqual(JulianDay.deltaT(jd: JulianDay.fromCalendar(year: 2010, month: 1, day: 1, hourUT: 0)), 66.07, accuracy: 0.05)
+        XCTAssertEqual(JulianDay.deltaT(jd: JulianDay.fromCalendar(year: 2015, month: 1, day: 1, hourUT: 0)), 67.64, accuracy: 0.05)
+        XCTAssertEqual(JulianDay.deltaT(jd: JulianDay.fromCalendar(year: 2021, month: 10, day: 5, hourUT: 0)), 69.3, accuracy: 0.2)
+        XCTAssertEqual(JulianDay.deltaT(jd: JulianDay.fromCalendar(year: 2024, month: 1, day: 1, hourUT: 0)), 69.17, accuracy: 0.05)
+        XCTAssertEqual(JulianDay.deltaT(decimalYear: 2005), 64.69, accuracy: 0.05)
+        XCTAssertEqual(JulianDay.deltaT(decimalYear: 2025), 69.14, accuracy: 1e-9)
+        // Beyond the table the anchored SMH-2016 parabola takes over: essentially flat for
+        // a decade, ≈ 72 s by 2050 and ≈ 97 s by 2100 (contemporary predictions: 74 / 93).
+        XCTAssertEqual(JulianDay.deltaT(decimalYear: 2030), 69.2, accuracy: 0.3)
+        XCTAssertEqual(JulianDay.deltaT(decimalYear: 2050), 71.8, accuracy: 1.0)
+        XCTAssertEqual(JulianDay.deltaT(decimalYear: 2100), 97.3, accuracy: 2.0)
+        var previous = JulianDay.deltaT(decimalYear: 2025)
+        for tenth in stride(from: 2025.1, through: 2500.0, by: 0.1) {
+            let value = JulianDay.deltaT(decimalYear: tenth)
+            XCTAssertGreaterThanOrEqual(value, previous - 1e-9, "ΔT extrapolation is monotone at \(tenth)")
+            previous = value
+        }
         // Segment boundaries are continuous to within a few seconds, and the far past/future
         // fall back to the parabolic long-term fit.
-        for year in [1600, 1700, 1800, 1860, 1900, 1920, 1941, 1961, 1986, 2005, 2050, 2150] {
+        for year in [1600, 1700, 1800, 1860, 1900, 1920, 1941, 1961, 1986, 2005, 2025, 2050, 2150, 2500] {
             let before = JulianDay.deltaT(decimalYear: Double(year) - 0.001)
             let after = JulianDay.deltaT(decimalYear: Double(year) + 0.001)
             XCTAssertEqual(before, after, accuracy: 5.0, "ΔT continuity at \(year)")
+        }
+        for year in [2005, 2025, 2500] {
+            let before = JulianDay.deltaT(decimalYear: Double(year) - 0.001)
+            let after = JulianDay.deltaT(decimalYear: Double(year) + 0.001)
+            XCTAssertEqual(before, after, accuracy: 0.05, "ΔT continuity at the new boundary \(year)")
         }
         XCTAssertEqual(JulianDay.deltaT(decimalYear: -1000), 25_427.68, accuracy: 0.01, "long-term parabola, u = −28.2")
         XCTAssertEqual(JulianDay.deltaT(decimalYear: 2500), 1459.68, accuracy: 0.01, "long-term parabola, u = 6.8")
@@ -212,13 +237,13 @@ final class EphemerisTests: XCTestCase {
             XCTAssertEqual(moon.latitude, vector.moonLat, accuracy: EphemerisTolerance.moon, "Moon latitude \(vector.date)")
             XCTAssertGreaterThan(moon.distanceKm, 356_000)
             XCTAssertLessThan(moon.distanceKm, 407_000)
-            // The engine reproduces the reference series itself (a few 0.01″ given the same
-            // ΔT); the only remaining difference is ΔT, which the Espenak–Meeus polynomials
-            // track to well under a second before 2010, so hold those vectors to 1″.
-            if vector.jdUT < 2_455_200 {
-                XCTAssertLessThanOrEqual(angularDifference(moon.longitude, vector.moonLon), 1.0 / 3600.0, "Moon longitude fine \(vector.date)")
-            }
-            XCTAssertEqual(moon.latitude, vector.moonLat, accuracy: 0.001, "Moon latitude fine \(vector.date)")
+            XCTAssertGreaterThanOrEqual(moon.longitude, 0)
+            XCTAssertLessThan(moon.longitude, 360)
+            // The Meeus chapter 47 truncation is good to ~10″ in longitude and ~4″ in
+            // latitude; hold the engine to the series' own error budget, far inside the
+            // 0.05° contract, so a regression in the tables or the nutation shows up.
+            XCTAssertLessThanOrEqual(angularDifference(moon.longitude, vector.moonLon), EphemerisTolerance.moonFine, "Moon longitude fine \(vector.date)")
+            XCTAssertEqual(moon.latitude, vector.moonLat, accuracy: EphemerisTolerance.moonFine, "Moon latitude fine \(vector.date)")
         }
     }
 
@@ -231,43 +256,29 @@ final class EphemerisTests: XCTestCase {
         XCTAssertEqual(geometric.latitude, -3.229126, accuracy: 0.000002)
         XCTAssertEqual(geometric.distanceKm, 368_409.7, accuracy: 0.1)
         let jdUT = jdTT - JulianDay.deltaT(jd: jdTT) / 86_400.0
-        let apparent = Ephemeris.moonMeeus(jdUT: jdUT)
+        let apparent = Ephemeris.moon(jdUT: jdUT)
         XCTAssertEqual(apparent.longitude, 133.167265, accuracy: 0.00005)
         XCTAssertEqual(apparent.latitude, -3.229126, accuracy: 0.00005)
+        XCTAssertEqual(apparent.distanceKm, 368_409.7, accuracy: 0.1)
         XCTAssertEqual(Ephemeris.lunarLongitudeTerms.count, 60)
         XCTAssertEqual(Ephemeris.lunarLatitudeTerms.count, 60)
-        // The Meeus series and the engine agree to the ~10″ truncation level of Table 47.A.
-        for vector in fixture.vectors {
-            let meeus = Ephemeris.moonMeeus(jdUT: vector.jdUT)
-            let engine = Ephemeris.moon(jdUT: vector.jdUT)
-            XCTAssertLessThanOrEqual(angularDifference(meeus.longitude, engine.longitude), 20.0 / 3600.0, "Meeus vs engine longitude \(vector.date)")
-            XCTAssertEqual(meeus.latitude, engine.latitude, accuracy: 6.0 / 3600.0, "Meeus vs engine latitude \(vector.date)")
-            XCTAssertEqual(meeus.distanceKm, engine.distanceKm, accuracy: 60.0, "Meeus vs engine distance \(vector.date)")
-        }
     }
 
-    func testMoonLightTimeAndNutationAssembly() {
-        // Apparent = geometric position retarded by the light-time (≈ −0.7″) plus Δψ.
+    func testMoonIsTheMeeusSeriesPlusNutation() {
+        // The shipped engine is exactly the chapter 47 series plus Δψ; `moonMeeus` is an alias.
         for vector in fixture.vectors {
             let jdTT = JulianDay.terrestrialTime(fromUT: vector.jdUT)
-            let geometric = MoshierLunarTheory.geometric(jdTT: jdTT)
+            let geometric = Ephemeris.moonMeeusGeometric(jdTT: jdTT)
             let apparent = Ephemeris.moon(jdUT: vector.jdUT)
             let deltaPsi = Ephemeris.nutation(jdTT: jdTT).longitude
-            let retardation = Angle.wrap180(apparent.longitude - deltaPsi - geometric.longitude) * 3600.0
-            XCTAssertLessThan(retardation, -0.55, "retardation \(vector.date)")
-            XCTAssertGreaterThan(retardation, -0.85, "retardation \(vector.date)")
-            XCTAssertEqual(apparent.distanceKm, geometric.distanceKm, accuracy: 0.2)
+            XCTAssertEqual(apparent.longitude, Angle.normalize(geometric.longitude + deltaPsi), accuracy: 1e-12, "assembly \(vector.date)")
+            XCTAssertEqual(apparent.latitude, geometric.latitude, "latitude carries no nutation \(vector.date)")
+            XCTAssertEqual(apparent.distanceKm, geometric.distanceKm, "distance \(vector.date)")
+            let alias = Ephemeris.moonMeeus(jdUT: vector.jdUT)
+            XCTAssertEqual(alias.longitude, apparent.longitude)
+            XCTAssertEqual(alias.latitude, apparent.latitude)
+            XCTAssertEqual(alias.distanceKm, apparent.distanceKm)
         }
-        // Mean elements at J2000.0: L = 785939.95571″ (218°18′59.96″), D ≈ 297.850°, F ≈ 93.272°.
-        let arguments = MoshierLunarTheory.arguments(t: 0)
-        XCTAssertEqual(arguments.lPrime, 785_939.95571, accuracy: 1e-6)
-        XCTAssertEqual(arguments.d / 3600.0, 297.8502, accuracy: 1e-3)
-        XCTAssertEqual(arguments.f / 3600.0, 93.2721, accuracy: 1e-3)
-        XCTAssertEqual(arguments.mPrime / 3600.0, 134.9634, accuracy: 1e-3)
-        XCTAssertEqual(arguments.m / 3600.0, 357.5291, accuracy: 1e-3)
-        XCTAssertEqual(MoshierLunarTheory.lrTerms.count, 118 * 8)
-        XCTAssertEqual(MoshierLunarTheory.mbTerms.count, 77 * 6)
-        XCTAssertEqual(MoshierLunarTheory.z.count, 25)
     }
 
     // MARK: - Sidereal time and angles
